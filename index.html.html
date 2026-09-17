@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudSwyft · Client Contract</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @page {
+            size: A4;
+            margin: 14mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --cloud-blue: #0077be;
+            --cloud-deep: #0a2a4a;
+            --cloud-soft: #e6f0fa;
+            --cloud-sky: #4a9fd8;
+            --cloud-accent: #d4e9ff;
+            --cloud-white: #ffffff;
+            --cloud-frost: #f5faff;
+            --cloud-shadow: rgba(0, 119, 190, 0.12);
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f7fe 0%, #dae9f7 100%);
+            color: #0a2a4a;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.55;
+            padding: 28px 16px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ⭐ 4 BACKGROUND ILLUSTRATIONS — ONE PER CORNER ⭐ */
+        .bg-deco {
+            position: fixed;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.18;
+            /* ⬅️ bumped up so they're visible */
+            transition: opacity 0.3s;
+        }
+
+        .bg-deco img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* 1.png — top-left */
+        .bg-1 {
+            top: -20px;
+            left: -30px;
+            width: 340px;
+        }
+
+        /* 2.png — top-right (pushed further right + smaller so it peeks out) */
+        .bg-2 {
+            top: -20px;
+            right: -80px;
+            width: 380px;
+        }
+
+        /* 3.png — bottom-left */
+        .bg-3 {
+            bottom: -30px;
+            left: -30px;
+            width: 360px;
+        }
+
+        /* 4.png — bottom-right (pushed further right so it peeks out) */
+        .bg-4 {
+            bottom: -30px;
+            right: -60px;
+            width: 340px;
+        }
+
+        /* ⭐ Narrower contract card so right-side images are visible ⭐ */
+        .contract-wrapper {
+            max-width: 880px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ----- TOOLBAR ----- */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .toolbar button,
+        .clear-btn {
+            border: 0;
+            border-radius: 40px;
+            padding: 10px 22px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 14px var(--cloud-shadow);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar button {
+            background: linear-gradient(135deg, #0077be 0%, #005a9c 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .toolbar button:hover {
+            background: linear-gradient(135deg, #0088d0 0%, #0068b0 100%);
+            box-shadow: 0 10px 22px rgba(0, 119, 190, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .clear-btn {
+            background: var(--cloud-accent);
+            color: var(--cloud-deep);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border-radius: 30px;
+            box-shadow: none;
+            border: 1px solid #b8d4f0;
+            transition: background 0.2s;
+        }
+
+        .clear-btn:hover {
+            background: #c2dcf5;
+        }
+
+        /* ----- CONTRACT CARD ----- */
+        .contract {
+            background: rgba(255, 255, 255, 0.88);
+            /* ⬅️ slightly more transparent */
+            backdrop-filter: blur(14px);
+            border-radius: 32px;
+            padding: 48px 56px;
+            box-shadow: 0 30px 50px rgba(0, 55, 100, 0.15), 0 12px 25px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: box-shadow 0.3s;
+        }
+
+        .contract::before {
+            content: "☁";
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-size: 220px;
+            color: rgba(0, 119, 190, 0.04);
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 0;
+            transform: rotate(6deg);
+            font-weight: 300;
+        }
+
+        .contract::after {
+            content: "☁";
+            position: absolute;
+            bottom: -40px;
+            left: -20px;
+            font-size: 260px;
+            color: rgba(0, 119, 190, 0.025);
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 0;
+            transform: rotate(-8deg);
+        }
+
+        .contract>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ----- HEADER ----- */
+        .contract-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            padding-bottom: 25px;
+            border-bottom: 4px solid var(--cloud-blue);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 220px;
+        }
+
+        .brand-logo {
+            height: 62px;
+            width: auto;
+            max-width: 260px;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0, 119, 190, 0.15));
+        }
+
+        .header-title {
+            text-align: right;
+        }
+
+        .header-title h2 {
+            margin: 0 0 4px;
+            color: var(--cloud-deep);
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0, 119, 190, 0.08);
+        }
+
+        .header-title p {
+            margin: 0;
+            font-size: 12px;
+            color: #3f5f7a;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+        }
+
+        /* ----- SECTIONS ----- */
+        section {
+            margin-bottom: 32px;
+            page-break-inside: avoid;
+        }
+
+        h3 {
+            color: var(--cloud-deep);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            margin: 0 0 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #cde0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3::before {
+            content: "●";
+            color: var(--cloud-blue);
+            font-size: 14px;
+            filter: drop-shadow(0 1px 2px rgba(0, 119, 190, 0.3));
+        }
+
+        h4 {
+            color: var(--cloud-deep);
+            margin: 0 0 16px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        p {
+            margin: 0 0 12px;
+            font-size: 13.5px;
+            text-align: justify;
+            color: #143450;
+        }
+
+        ul {
+            margin: 8px 0 12px 20px;
+            padding-left: 10px;
+        }
+
+        li {
+            margin-bottom: 7px;
+            font-size: 13.5px;
+            color: #143450;
+        }
+
+        /* ----- SECTION 3 SHORT HERO IMAGE ----- */
+        .section-hero {
+            margin: 4px 0 20px;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 22px rgba(0, 119, 190, 0.13);
+            border: 1px solid #cfe2f3;
+            background: white;
+            transition: box-shadow 0.25s, transform 0.2s;
+        }
+
+        .section-hero:hover {
+            box-shadow: 0 14px 32px rgba(0, 119, 190, 0.20);
+            transform: translateY(-2px);
+        }
+
+        .section-hero img {
+            display: block;
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            object-position: center;
+            background: #f8fcff;
+        }
+
+        /* ----- FORM GRID ----- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 20px;
+            margin-top: 16px;
+        }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            color: #1a3e60;
+            font-size: 12.5px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            margin-bottom: 4px;
+        }
+
+        input,
+        textarea {
+            display: block;
+            width: 100%;
+            margin-top: 4px;
+            border: 1.5px solid #bfd6ec;
+            border-radius: 16px;
+            padding: 12px 16px;
+            background: var(--cloud-frost);
+            color: var(--cloud-deep);
+            font: inherit;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 50, 100, 0.02);
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--cloud-blue);
+            background: white;
+            box-shadow: 0 0 0 5px rgba(0, 119, 190, 0.1);
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+            border-radius: 18px;
+        }
+
+        .inline-input {
+            display: inline-block;
+            width: 210px;
+            margin: 0 4px;
+            padding: 5px 8px;
+            border: 0;
+            border-bottom: 2px solid #9bb8d4;
+            border-radius: 0;
+            background: transparent;
+            vertical-align: baseline;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--cloud-deep);
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .inline-input:focus {
+            border-bottom-color: var(--cloud-blue);
+            background: rgba(0, 119, 190, 0.03);
+            outline: none;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .inline-input.wide {
+            width: 380px;
+        }
+
+        /* ----- SIGNATURES ----- */
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+            margin-top: 40px;
+            page-break-inside: avoid;
+        }
+
+        .signature-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f4faff 100%);
+            border-radius: 26px;
+            padding: 24px 22px 20px;
+            border: 1px solid #d4e6f7;
+            box-shadow: 0 8px 20px rgba(0, 90, 150, 0.06);
+            transition: box-shadow 0.25s, transform 0.2s;
+        }
+
+        .signature-card:hover {
+            box-shadow: 0 14px 30px rgba(0, 119, 190, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .signature-card h4 {
+            font-size: 14px;
+            margin-bottom: 14px;
+            color: var(--cloud-deep);
+            border-left: 5px solid var(--cloud-blue);
+            padding-left: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .signature-card label {
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #1f4a70;
+        }
+
+        .signature-pad {
+            display: block;
+            width: 100%;
+            height: 100px;
+            margin: 8px 0 8px;
+            border: 1.8px dashed #92b8d8;
+            border-radius: 20px;
+            background: white;
+            touch-action: none;
+            cursor: crosshair;
+            transition: border 0.2s, box-shadow 0.2s;
+            box-shadow: inset 0 2px 6px rgba(0, 50, 100, 0.02);
+        }
+
+        .signature-pad:hover {
+            border-color: var(--cloud-blue);
+            box-shadow: inset 0 2px 10px rgba(0, 119, 190, 0.06);
+        }
+
+        /* ----- FOOTER ----- */
+        footer {
+            margin-top: 38px;
+            padding-top: 20px;
+            border-top: 2px solid #cde0f0;
+            text-align: center;
+            color: var(--cloud-deep);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        footer p {
+            text-align: center;
+            margin: 0;
+            font-size: 14px;
+            color: var(--cloud-deep);
+            font-weight: 600;
+            letter-spacing: 0.4px;
+        }
+
+        footer p::before {
+            content: "☁ ";
+            color: var(--cloud-blue);
+            font-size: 16px;
+        }
+
+        footer p::after {
+            content: " ☁";
+            color: var(--cloud-blue);
+            font-size: 16px;
+        }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 1100px) {
+
+            /* When the screen gets tight, keep the images but shrink them */
+            .bg-1 {
+                width: 240px;
+            }
+
+            .bg-2 {
+                width: 260px;
+                right: -60px;
+            }
+
+            .bg-3 {
+                width: 250px;
+            }
+
+            .bg-4 {
+                width: 240px;
+                right: -50px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .bg-deco {
+                opacity: 0.10;
+            }
+
+            .bg-1 {
+                width: 170px;
+            }
+
+            .bg-2 {
+                width: 180px;
+                right: -50px;
+            }
+
+            .bg-3 {
+                width: 180px;
+            }
+
+            .bg-4 {
+                width: 170px;
+                right: -40px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 12px 10px;
+            }
+
+            .contract {
+                padding: 28px 20px;
+                border-radius: 26px;
+            }
+
+            .contract-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .header-title {
+                text-align: left;
+            }
+
+            .form-grid,
+            .signatures {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .form-grid .full {
+                grid-column: auto;
+            }
+
+            .inline-input,
+            .inline-input.wide {
+                width: 100%;
+                margin: 6px 0;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .contract::before {
+                font-size: 140px;
+                top: -10px;
+                right: 0;
+            }
+
+            .contract::after {
+                font-size: 160px;
+                bottom: -30px;
+                left: -10px;
+            }
+
+            .section-hero img {
+                max-height: 110px;
+            }
+
+            .bg-deco {
+                opacity: 0.07;
+            }
+
+            .bg-1,
+            .bg-2,
+            .bg-3,
+            .bg-4 {
+                width: 130px;
+            }
+
+            .bg-2 {
+                right: -30px;
+            }
+
+            .bg-4 {
+                right: -30px;
+            }
+        }
+
+        /* ----- PRINT ----- */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .bg-deco {
+                position: fixed;
+                opacity: 0.08;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .bg-1 {
+                width: 260px;
+            }
+
+            .bg-2 {
+                width: 280px;
+                right: -60px;
+            }
+
+            .bg-3 {
+                width: 270px;
+            }
+
+            .bg-4 {
+                width: 260px;
+                right: -50px;
+            }
+
+            .contract-wrapper {
+                padding: 0;
+                max-width: 100%;
+            }
+
+            .contract {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 0;
+                border: none;
+                background: transparent;
+                backdrop-filter: none;
+            }
+
+            .contract::before,
+            .contract::after {
+                display: none;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            input,
+            textarea,
+            .inline-input {
+                border: 0 !important;
+                border-bottom: 1.5px solid #777 !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                border-radius: 0 !important;
+                color: #000 !important;
+                font-weight: 500;
+            }
+
+            textarea {
+                border: 1.5px solid #777 !important;
+                padding: 6px !important;
+                border-radius: 8px !important;
+            }
+
+            .signature-pad {
+                border: 1.5px solid #777 !important;
+                border-radius: 12px !important;
+                background: white !important;
+            }
+
+            .contract-header {
+                border-bottom: 3px solid #0a2a4a;
+            }
+
+            h3 {
+                border-bottom: 1.5px solid #aaa;
+            }
+
+            h3::before {
+                color: #0a2a4a;
+            }
+
+            .signature-card {
+                background: transparent;
+                border: 1px solid #ccc;
+                box-shadow: none;
+                border-radius: 8px;
+            }
+
+            .signature-card h4 {
+                border-left-color: #0a2a4a;
+            }
+
+            .brand-logo {
+                height: 58px;
+            }
+
+            footer p::before,
+            footer p::after {
+                color: #0a2a4a;
+            }
+
+            .section-hero {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+            }
+
+            .section-hero img {
+                max-height: 140px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ⭐ 4 CORNER BACKGROUND ILLUSTRATIONS ⭐ -->
+    <div class="bg-deco bg-1" aria-hidden="true">
+        <img src="1.png" alt="">
+    </div>
+    <div class="bg-deco bg-2" aria-hidden="true">
+        <img src="2.png" alt="">
+    </div>
+    <div class="bg-deco bg-3" aria-hidden="true">
+        <img src="3.png" alt="">
+    </div>
+    <div class="bg-deco bg-4" aria-hidden="true">
+        <img src="4.png" alt="">
+    </div>
+
+    <div class="contract-wrapper">
+        <div class="toolbar no-print">
+            <button type="button" onclick="window.print()"><i class="fas fa-file-pdf"></i> Download / Save as
+                PDF</button>
+            <button type="button" onclick="window.print()"><i class="fas fa-print"></i> Print Contract</button>
+        </div>
+
+        <article class="contract">
+
+            <!-- HEADER: Uses logo.png -->
+            <header class="contract-header">
+                <div class="brand">
+                    <img src="logo.png" alt="CloudSwyft Global Systems Inc." class="brand-logo">
+                </div>
+                <div class="header-title">
+                    <h2>Client Contract</h2>
+                    <p>Creating opportunities through technology, digital learning, and collaboration.</p>
+                </div>
+            </header>
+
+            <!-- 1. CLIENT INFORMATION -->
+            <section>
+                <h3>1. CLIENT INFORMATION</h3>
+                <p>The Client shall provide the following information:</p>
+
+                <div class="form-grid">
+                    <label>Full Name / Authorized Representative:
+                        <input type="text" id="clientName" placeholder="Enter full name">
+                    </label>
+
+                    <label>Organization / Institution:
+                        <input type="text" id="organization" placeholder="Enter organization / institution">
+                    </label>
+
+                    <label>Position / Job Title:
+                        <input type="text" id="position" placeholder="Enter position / job title">
+                    </label>
+
+                    <label>Email Address:
+                        <input type="email" id="email" placeholder="Enter email address">
+                    </label>
+
+                    <label>Contact Number:
+                        <input type="tel" id="contact" placeholder="Enter contact number">
+                    </label>
+
+                    <label>Date:
+                        <input type="date" id="clientDate">
+                    </label>
+                </div>
+            </section>
+
+            <!-- 2. PURPOSE -->
+            <section>
+                <h3>2. PURPOSE OF THE PARTNERSHIP / COLLABORATION</h3>
+                <p>
+                    This Agreement establishes the understanding between CloudSwyft Global Systems Inc.
+                    and <input class="inline-input" id="purposeOrganization" type="text"
+                        placeholder="Organization / Institution">,
+                    represented by <input class="inline-input" id="purposeRepresentative" type="text"
+                        placeholder="Authorized Representative">,
+                    regarding their proposed <input class="inline-input" id="proposedType" type="text"
+                        placeholder="partnership / collaboration">.
+                </p>
+                <p>
+                    The partnership/collaboration shall focus on
+                    <input class="inline-input wide" id="purposeFocus" type="text"
+                        placeholder="Enter focus of the partnership / collaboration">,
+                    with the Parties working together toward the objectives and expected outcomes mutually agreed upon
+                    under this Agreement.
+                </p>
+                <p>
+                    The specific activities, responsibilities, resources, and other arrangements shall be determined
+                    based on the nature and scope of the partnership/collaboration.
+                </p>
+            </section>
+
+            <!-- 3. COLLABORATION DETAILS -->
+            <section>
+                <h3>3. COLLABORATION DETAILS</h3>
+
+                <!-- Virtual Lab image — shorter, no caption -->
+                <div class="section-hero">
+                    <img src="Virtual Lab.png" alt="Virtual Lab">
+                </div>
+
+                <p>The Client shall provide the following information regarding the proposed partnership or
+                    collaboration:</p>
+
+                <div class="form-grid">
+                    <label>Proposed Start Date:
+                        <input type="date" id="startDate">
+                    </label>
+
+                    <label>Expected End Date:
+                        <input type="date" id="endDate">
+                    </label>
+
+                    <label class="full">Project / Initiative Name:
+                        <input type="text" id="projectName" placeholder="Enter project or initiative name">
+                    </label>
+
+                    <label class="full">Description of the Collaboration:
+                        <textarea id="description"
+                            placeholder="Describe the proposed partnership, collaboration, or initiative"></textarea>
+                    </label>
+
+                    <label class="full">Expected Outcome / Objective:
+                        <textarea id="outcome" placeholder="Enter expected outcome or objective"></textarea>
+                    </label>
+                </div>
+            </section>
+
+            <!-- 4. RESPONSIBILITIES -->
+            <section>
+                <h3>4. RESPONSIBILITIES OF THE PARTIES</h3>
+                <p><strong>The Partner shall:</strong></p>
+                <ul>
+                    <li>Provide accurate and complete information relevant to the partnership or collaboration.</li>
+                    <li>Participate in the agreed activities and initiatives.</li>
+                    <li>Provide the necessary information, materials, or resources that have been mutually agreed upon.
+                    </li>
+                    <li>Communicate relevant updates, concerns, or changes to CloudSwyft.</li>
+                    <li>Comply with the mutually agreed terms for the partnership or collaboration.</li>
+                </ul>
+
+                <p><strong>CloudSwyft shall:</strong></p>
+                <ul>
+                    <li>Coordinate with the Partner regarding the agreed partnership or collaboration.</li>
+                    <li>Participate in the mutually agreed activities and initiatives.</li>
+                    <li>Provide relevant information and resources that have been agreed upon by both parties.</li>
+                    <li>Communicate relevant updates and requirements to the Partner.</li>
+                    <li>Work with the Partner toward the agreed objectives of the collaboration.</li>
+                </ul>
+            </section>
+
+            <!-- 5. CONFIDENTIALITY -->
+            <section>
+                <h3>5. CONFIDENTIALITY</h3>
+                <p>
+                    The Partner and CloudSwyft shall maintain the confidentiality of non-public information shared
+                    in connection with the partnership or collaboration.
+                </p>
+                <p>
+                    Neither party shall disclose confidential information to unauthorized individuals or
+                    organizations unless otherwise agreed upon or required by applicable law.
+                </p>
+            </section>
+
+            <!-- 6. CHANGES -->
+            <section>
+                <h3>6. CHANGES TO THE AGREEMENT</h3>
+                <p>
+                    The Partner and CloudSwyft shall agree in writing to any significant changes to the purpose,
+                    scope, responsibilities, or other terms of this Agreement.
+                </p>
+                <p>Additional activities or initiatives may be included upon mutual agreement.</p>
+                <p>
+                    The Parties shall communicate with each other regarding any proposed changes to the
+                    partnership or collaboration.
+                </p>
+                <p>
+                    Any changes to the purpose, scope, activities, responsibilities, timeline, or other significant
+                    terms of this Agreement shall be discussed and mutually agreed upon by the Parties.
+                </p>
+                <p>
+                    The Partner shall not be required to undertake additional activities or responsibilities that were
+                    not included in the original agreement unless such changes have been mutually agreed upon.
+                </p>
+                <p>
+                    Where necessary, the Parties shall document the agreed changes through a written amendment,
+                    updated agreement, or other form of documented approval.
+                </p>
+                <p>Any approved changes shall form part of the Agreement and shall be followed by both Parties.</p>
+            </section>
+
+            <!-- 7. DURATION -->
+            <section>
+                <h3>7. DURATION AND TERMINATION</h3>
+                <p>
+                    This Agreement may be terminated before the expected end date by either Party upon written
+                    notice to the other Party.
+                </p>
+                <p>
+                    Upon termination, the Parties shall communicate regarding any ongoing activities,
+                    responsibilities, or commitments that need to be completed or addressed.
+                </p>
+                <p>
+                    Any provisions of this Agreement that are intended to remain in effect after termination,
+                    including confidentiality and intellectual property obligations, shall continue to apply.
+                </p>
+            </section>
+
+            <!-- 8. CONFIRMATION -->
+            <section>
+                <h3>8. CONFIRMATION AND AGREEMENT</h3>
+                <p>
+                    The Partner shall confirm that all information provided in this Agreement is accurate and complete.
+                </p>
+                <p>
+                    By completing the required information and providing an electronic signature, the Partner
+                    acknowledges that the Partner has read, understood, and agreed to the terms and conditions of this
+                    Agreement.
+                </p>
+                <p>
+                    The Partner further acknowledges that the proposed partnership, collaboration, project, or
+                    initiative has been discussed and mutually understood by both Parties. The Partner agrees to
+                    fulfill the responsibilities and commitments mutually agreed upon with CloudSwyft, and understands
+                    that any additional activities, commitments, or changes shall be subject to mutual agreement between
+                    the Parties.
+                </p>
+                <p>
+                    By providing an electronic signature, the authorized representatives acknowledge their agreement
+                    to the terms stated in this Agreement.
+                </p>
+            </section>
+
+            <!-- 9. USE OF MATERIALS -->
+            <section>
+                <h3>9. USE AND REPRODUCTION OF CLOUDSWYFT MATERIALS</h3>
+                <p>
+                    The Client shall not reproduce, copy, modify, distribute, publish, or otherwise use the CloudSwyft
+                    name,
+                    logo, branding, documents, materials, or other proprietary content provided in connection with this
+                    Agreement without the prior written consent of CloudSwyft Global Systems Inc.
+                </p>
+                <p>
+                    The CloudSwyft name, logo, and other materials included in this Agreement are provided solely for
+                    the purpose of reviewing and completing the proposed partnership or collaboration.
+                </p>
+                <p>
+                    Any permitted use following the execution of this Agreement shall remain subject to the terms and
+                    conditions agreed upon by the Parties.
+                </p>
+            </section>
+
+            <!-- SIGNATURES -->
+            <section class="signatures">
+                <div class="signature-card">
+                    <h4>CLIENT</h4>
+                    <label>Authorized Representative:
+                        <input type="text" id="signatureClientName" placeholder="Enter full name">
+                    </label>
+
+                    <label>Signature:</label>
+                    <canvas id="clientSignature" class="signature-pad"></canvas>
+                    <button type="button" class="clear-btn no-print" onclick="clearCanvas('clientSignature')">Clear
+                        Signature</button>
+
+                    <label>Date:
+                        <input type="date" id="signatureClientDate">
+                    </label>
+                </div>
+
+                <div class="signature-card">
+                    <h4>CLOUDSWYFT GLOBAL SYSTEMS INC.</h4>
+                    <label>Authorized Representative:
+                        <input type="text" id="cloudswyftName" placeholder="Enter full name">
+                    </label>
+
+                    <label>Signature:</label>
+                    <canvas id="cloudswyftSignature" class="signature-pad"></canvas>
+                    <button type="button" class="clear-btn no-print" onclick="clearCanvas('cloudswyftSignature')">Clear
+                        Signature</button>
+
+                    <label>Date:
+                        <input type="date" id="cloudswyftDate">
+                    </label>
+                </div>
+            </section>
+
+            <!-- COMPLETION -->
+            <section>
+                <h3>AGREEMENT COMPLETION</h3>
+                <p>
+                    Once the required information has been completed and the authorized representatives have
+                    provided their electronic signatures, the completed Agreement shall be retained by the Parties for
+                    reference.
+                </p>
+            </section>
+
+            <footer>
+                <p>Thank you for partnering with CloudSwyft.</p>
+            </footer>
+
+        </article>
+    </div>
+
+    <script>
+        // --- SIGNATURE PADS ---
+        function setupCanvas(id) {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext("2d");
+            let drawing = false;
+
+            function resize() {
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                const rect = canvas.getBoundingClientRect();
+                const old = canvas.toDataURL();
+                canvas.width = rect.width * ratio;
+                canvas.height = rect.height * ratio;
+                ctx.scale(ratio, ratio);
+                ctx.lineWidth = 2.8;
+                ctx.lineCap = "round";
+                ctx.strokeStyle = "#0a2a4a";
+
+                if (old !== "data:,") {
+                    const img = new Image();
+                    img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+                    img.src = old;
+                }
+            }
+
+            resize();
+            window.addEventListener("resize", resize);
+
+            function position(e) {
+                const rect = canvas.getBoundingClientRect();
+                const point = e.touches ? e.touches[0] : e;
+                return {
+                    x: point.clientX - rect.left,
+                    y: point.clientY - rect.top
+                };
+            }
+
+            function start(e) {
+                e.preventDefault();
+                drawing = true;
+                const p = position(e);
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const p = position(e);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+            }
+
+            function stop() {
+                drawing = false;
+            }
+
+            canvas.addEventListener("mousedown", start);
+            canvas.addEventListener("mousemove", draw);
+            canvas.addEventListener("mouseup", stop);
+            canvas.addEventListener("mouseleave", stop);
+
+            canvas.addEventListener("touchstart", start, { passive: false });
+            canvas.addEventListener("touchmove", draw, { passive: false });
+            canvas.addEventListener("touchend", stop);
+        }
+
+        function clearCanvas(id) {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        setupCanvas("clientSignature");
+        setupCanvas("cloudswyftSignature");
+
+        // --- AUTO-FILL LOGIC ---
+        document.getElementById("organization").addEventListener("input", e => {
+            document.getElementById("purposeOrganization").value = e.target.value;
+        });
+
+        document.getElementById("clientName").addEventListener("input", e => {
+            document.getElementById("purposeRepresentative").value = e.target.value;
+            document.getElementById("signatureClientName").value = e.target.value;
+        });
+
+        document.getElementById("clientDate").addEventListener("input", e => {
+            document.getElementById("signatureClientDate").value = e.target.value;
+        });
+    </script>
+
+</body>
+
+</html>
