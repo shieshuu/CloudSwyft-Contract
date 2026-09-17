@@ -10,9 +10,6 @@
         @page {
             size: A4;
             margin: 14mm;
-            /* ⭐ Removes browser header/footer in print/PDF ⭐ */
-            margin-top: 0;
-            margin-bottom: 0;
         }
 
         * {
@@ -43,7 +40,7 @@
             overflow-x: hidden;
         }
 
-        /* ⭐ 4 BACKGROUND ILLUSTRATIONS — SCREEN ONLY ⭐ */
+        /* ⭐ BACKGROUND ILLUSTRATIONS — SCREEN ONLY ⭐ */
         .bg-deco {
             position: fixed;
             z-index: 0;
@@ -361,33 +358,44 @@
             min-height: 90px;
             resize: vertical;
             border-radius: 18px;
+            field-sizing: content;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
+        /* ⭐ INLINE INPUT — now a contenteditable span that WRAPS ⭐ */
         .inline-input {
-            display: inline-block;
-            width: 210px;
-            margin: 0 4px;
-            padding: 5px 8px;
-            border: 0;
+            display: inline;
+            min-width: 140px;
+            padding: 2px 6px;
             border-bottom: 2px solid #9bb8d4;
-            border-radius: 0;
             background: transparent;
-            vertical-align: baseline;
             font-size: 13px;
             font-weight: 500;
             color: var(--cloud-deep);
+            font-family: inherit;
+            line-height: inherit;
             transition: border-color 0.2s, background 0.2s;
+            outline: none;
+            /* ⭐ KEY — make it wrap and break long words */
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            cursor: text;
         }
 
         .inline-input:focus {
             border-bottom-color: var(--cloud-blue);
-            background: rgba(0, 119, 190, 0.03);
-            outline: none;
-            border-radius: 8px 8px 0 0;
+            background: rgba(0, 119, 190, 0.05);
+            border-radius: 6px 6px 0 0;
         }
 
-        .inline-input.wide {
-            width: 380px;
+        .inline-input:empty::before {
+            content: attr(data-placeholder);
+            color: #8aa3bd;
+            font-style: italic;
+            font-weight: 400;
         }
 
         /* ----- SIGNATURES ----- */
@@ -554,10 +562,8 @@
                 grid-column: auto;
             }
 
-            .inline-input,
-            .inline-input.wide {
-                width: 100%;
-                margin: 6px 0;
+            .inline-input {
+                min-width: 100px;
             }
 
             .toolbar {
@@ -603,8 +609,6 @@
 
         /* ----- PRINT ----- */
         @media print {
-
-            /* ⭐ Reset page and force full-bleed content ⭐ */
             @page {
                 size: A4;
                 margin: 14mm;
@@ -616,17 +620,14 @@
                 padding: 0 !important;
                 margin: 0 !important;
                 font-size: 12px;
-                /* ⭐ Prevents extra blank/URL footer line ⭐ */
                 width: 100%;
                 height: auto;
             }
 
-            /* ⭐ HIDE background illustrations ⭐ */
             .bg-deco {
                 display: none !important;
             }
 
-            /* ⭐ HIDE toolbar, buttons, remove-image, upload UI ⭐ */
             .no-print,
             .toolbar,
             .clear-btn,
@@ -655,10 +656,8 @@
                 display: none !important;
             }
 
-            /* ⭐ Form fields become clean lines ⭐ */
             input,
-            textarea,
-            .inline-input {
+            textarea {
                 border: 0 !important;
                 border-bottom: 1.5px solid #777 !important;
                 background: transparent !important;
@@ -674,6 +673,18 @@
                 border: 1.5px solid #777 !important;
                 padding: 6px !important;
                 border-radius: 8px !important;
+            }
+
+            /* ⭐ Inline inputs print as clean underlined text ⭐ */
+            .inline-input {
+                border-bottom: 1px solid #777 !important;
+                background: transparent !important;
+                padding: 2px 4px !important;
+                color: #000 !important;
+            }
+
+            .inline-input:empty::before {
+                content: "";
             }
 
             .signature-pad {
@@ -725,7 +736,6 @@
                 max-height: 140px;
             }
 
-            /* ⭐ Prevent page breaks in awkward places ⭐ */
             section,
             .signatures,
             .signature-card {
@@ -737,19 +747,11 @@
 
 <body>
 
-    <!-- ⭐ 4 CORNER BACKGROUND ILLUSTRATIONS (screen only — hidden in PDF) ⭐ -->
-    <div class="bg-deco bg-1" aria-hidden="true">
-        <img src="1.png" alt="">
-    </div>
-    <div class="bg-deco bg-2" aria-hidden="true">
-        <img src="2.png" alt="">
-    </div>
-    <div class="bg-deco bg-3" aria-hidden="true">
-        <img src="3.png" alt="">
-    </div>
-    <div class="bg-deco bg-4" aria-hidden="true">
-        <img src="4.png" alt="">
-    </div>
+    <!-- BACKGROUND ILLUSTRATIONS (screen only) -->
+    <div class="bg-deco bg-1" aria-hidden="true"><img src="1.png" alt=""></div>
+    <div class="bg-deco bg-2" aria-hidden="true"><img src="2.png" alt=""></div>
+    <div class="bg-deco bg-3" aria-hidden="true"><img src="3.png" alt=""></div>
+    <div class="bg-deco bg-4" aria-hidden="true"><img src="4.png" alt=""></div>
 
     <div class="contract-wrapper">
         <div class="toolbar no-print">
@@ -760,7 +762,7 @@
 
         <article class="contract">
 
-            <!-- HEADER: Uses logo.png -->
+            <!-- HEADER -->
             <header class="contract-header">
                 <div class="brand">
                     <img src="logo.png" alt="CloudSwyft Global Systems Inc." class="brand-logo">
@@ -808,17 +810,17 @@
                 <h3>2. PURPOSE OF THE PARTNERSHIP / COLLABORATION</h3>
                 <p>
                     This Agreement establishes the understanding between CloudSwyft Global Systems Inc.
-                    and <input class="inline-input" id="purposeOrganization" type="text"
-                        placeholder="Organization / Institution">,
-                    represented by <input class="inline-input" id="purposeRepresentative" type="text"
-                        placeholder="Authorized Representative">,
-                    regarding their proposed <input class="inline-input" id="proposedType" type="text"
-                        placeholder="partnership / collaboration">.
+                    and <span class="inline-input" id="purposeOrganization" contenteditable="true"
+                        data-placeholder="Organization / Institution"></span>,
+                    represented by <span class="inline-input" id="purposeRepresentative" contenteditable="true"
+                        data-placeholder="Authorized Representative"></span>,
+                    regarding their proposed <span class="inline-input" id="proposedType" contenteditable="true"
+                        data-placeholder="partnership / collaboration"></span>.
                 </p>
                 <p>
                     The partnership/collaboration shall focus on
-                    <input class="inline-input wide" id="purposeFocus" type="text"
-                        placeholder="Enter focus of the partnership / collaboration">,
+                    <span class="inline-input" id="purposeFocus" contenteditable="true"
+                        data-placeholder="Enter focus of the partnership / collaboration"></span>,
                     with the Parties working together toward the objectives and expected outcomes mutually agreed upon
                     under this Agreement.
                 </p>
@@ -832,7 +834,6 @@
             <section>
                 <h3>3. COLLABORATION DETAILS</h3>
 
-                <!-- Virtual Lab image — shorter, no caption -->
                 <div class="section-hero">
                     <img src="Virtual Lab.png" alt="Virtual Lab">
                 </div>
@@ -1117,16 +1118,41 @@
 
         // --- AUTO-FILL LOGIC ---
         document.getElementById("organization").addEventListener("input", e => {
-            document.getElementById("purposeOrganization").value = e.target.value;
+            document.getElementById("purposeOrganization").textContent = e.target.value;
         });
 
         document.getElementById("clientName").addEventListener("input", e => {
-            document.getElementById("purposeRepresentative").value = e.target.value;
+            document.getElementById("purposeRepresentative").textContent = e.target.value;
             document.getElementById("signatureClientName").value = e.target.value;
         });
 
         document.getElementById("clientDate").addEventListener("input", e => {
             document.getElementById("signatureClientDate").value = e.target.value;
+        });
+
+        // --- SYNC contenteditable inline inputs back into auto-fill ---
+        document.getElementById("purposeOrganization").addEventListener("input", function () {
+            // don't overwrite the input field if user is editing here manually
+        });
+
+        document.getElementById("purposeRepresentative").addEventListener("input", function () {
+            // same
+        });
+
+        // Prevent Enter from inserting a newline in the contenteditable (single-line feel)
+        document.querySelectorAll(".inline-input").forEach(el => {
+            el.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    el.blur();
+                }
+            });
+            // Also handle paste as plain text so formatting doesn't break the layout
+            el.addEventListener("paste", function (e) {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData("text/plain");
+                document.execCommand("insertText", false, text);
+            });
         });
     </script>
 
