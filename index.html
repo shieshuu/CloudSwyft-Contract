@@ -10,6 +10,9 @@
         @page {
             size: A4;
             margin: 14mm;
+            /* ⭐ Removes browser header/footer in print/PDF ⭐ */
+            margin-top: 0;
+            margin-bottom: 0;
         }
 
         * {
@@ -40,13 +43,12 @@
             overflow-x: hidden;
         }
 
-        /* ⭐ 4 BACKGROUND ILLUSTRATIONS — ONE PER CORNER ⭐ */
+        /* ⭐ 4 BACKGROUND ILLUSTRATIONS — SCREEN ONLY ⭐ */
         .bg-deco {
             position: fixed;
             z-index: 0;
             pointer-events: none;
             opacity: 0.18;
-            /* ⬅️ bumped up so they're visible */
             transition: opacity 0.3s;
         }
 
@@ -56,35 +58,30 @@
             height: auto;
         }
 
-        /* 1.png — top-left */
         .bg-1 {
             top: -20px;
             left: -30px;
             width: 340px;
         }
 
-        /* 2.png — top-right (pushed further right + smaller so it peeks out) */
         .bg-2 {
             top: -20px;
             right: -80px;
             width: 380px;
         }
 
-        /* 3.png — bottom-left */
         .bg-3 {
             bottom: -30px;
             left: -30px;
             width: 360px;
         }
 
-        /* 4.png — bottom-right (pushed further right so it peeks out) */
         .bg-4 {
             bottom: -30px;
             right: -60px;
             width: 340px;
         }
 
-        /* ⭐ Narrower contract card so right-side images are visible ⭐ */
         .contract-wrapper {
             max-width: 880px;
             margin: 0 auto;
@@ -145,7 +142,6 @@
         /* ----- CONTRACT CARD ----- */
         .contract {
             background: rgba(255, 255, 255, 0.88);
-            /* ⬅️ slightly more transparent */
             backdrop-filter: blur(14px);
             border-radius: 32px;
             padding: 48px 56px;
@@ -485,8 +481,6 @@
 
         /* ----- RESPONSIVE ----- */
         @media (max-width: 1100px) {
-
-            /* When the screen gets tight, keep the images but shrink them */
             .bg-1 {
                 width: 240px;
             }
@@ -609,60 +603,59 @@
 
         /* ----- PRINT ----- */
         @media print {
+
+            /* ⭐ Reset page and force full-bleed content ⭐ */
+            @page {
+                size: A4;
+                margin: 14mm;
+            }
+
+            html,
             body {
-                background: white;
-                padding: 0;
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
                 font-size: 12px;
+                /* ⭐ Prevents extra blank/URL footer line ⭐ */
+                width: 100%;
+                height: auto;
             }
 
+            /* ⭐ HIDE background illustrations ⭐ */
             .bg-deco {
-                position: fixed;
-                opacity: 0.08;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                display: none !important;
             }
 
-            .bg-1 {
-                width: 260px;
-            }
-
-            .bg-2 {
-                width: 280px;
-                right: -60px;
-            }
-
-            .bg-3 {
-                width: 270px;
-            }
-
-            .bg-4 {
-                width: 260px;
-                right: -50px;
+            /* ⭐ HIDE toolbar, buttons, remove-image, upload UI ⭐ */
+            .no-print,
+            .toolbar,
+            .clear-btn,
+            .image-upload-area {
+                display: none !important;
             }
 
             .contract-wrapper {
-                padding: 0;
-                max-width: 100%;
+                padding: 0 !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
             }
 
             .contract {
-                box-shadow: none;
-                border-radius: 0;
-                padding: 0;
-                border: none;
-                background: transparent;
-                backdrop-filter: none;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                backdrop-filter: none !important;
+                overflow: visible !important;
             }
 
             .contract::before,
             .contract::after {
-                display: none;
-            }
-
-            .no-print {
                 display: none !important;
             }
 
+            /* ⭐ Form fields become clean lines ⭐ */
             input,
             textarea,
             .inline-input {
@@ -702,10 +695,10 @@
             }
 
             .signature-card {
-                background: transparent;
-                border: 1px solid #ccc;
-                box-shadow: none;
-                border-radius: 8px;
+                background: transparent !important;
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+                border-radius: 8px !important;
             }
 
             .signature-card h4 {
@@ -722,13 +715,21 @@
             }
 
             .section-hero {
-                box-shadow: none;
-                border: 1px solid #ccc;
-                border-radius: 8px;
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                border-radius: 8px !important;
+                page-break-inside: avoid;
             }
 
             .section-hero img {
                 max-height: 140px;
+            }
+
+            /* ⭐ Prevent page breaks in awkward places ⭐ */
+            section,
+            .signatures,
+            .signature-card {
+                page-break-inside: avoid;
             }
         }
     </style>
@@ -736,7 +737,7 @@
 
 <body>
 
-    <!-- ⭐ 4 CORNER BACKGROUND ILLUSTRATIONS ⭐ -->
+    <!-- ⭐ 4 CORNER BACKGROUND ILLUSTRATIONS (screen only — hidden in PDF) ⭐ -->
     <div class="bg-deco bg-1" aria-hidden="true">
         <img src="1.png" alt="">
     </div>
