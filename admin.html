@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudSwyft · Contract Editor (Private)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --cloud-blue: #0077be;
+      --cloud-deep: #0a2a4a;
+      --cloud-accent: #d4e9ff;
+      --cloud-frost: #f5faff;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(145deg, #f0f7fe 0%, #dae9f7 100%);
+      color: var(--cloud-deep);
+      padding: 0 16px 24px;
+      min-height: 100vh;
+    }
+
+    .admin-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ⭐ STICKY HEADER ⭐ */
+    .admin-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 0 0 24px 24px;
+      padding: 16px 32px;
+      margin: 0 -16px 20px;
+      box-shadow: 0 8px 24px rgba(0, 55, 100, 0.12);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-top: 5px solid var(--cloud-blue);
+      transition: box-shadow 0.3s, padding 0.3s;
+    }
+
+    .admin-header.scrolled {
+      padding: 10px 32px;
+      box-shadow: 0 4px 20px rgba(0, 55, 100, 0.18);
+    }
+
+    .admin-header h1 {
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: font-size 0.3s;
+    }
+
+    .admin-header.scrolled h1 {
+      font-size: 17px;
+    }
+
+    .admin-header h1::before {
+      content: "☁";
+      color: var(--cloud-blue);
+      font-size: 26px;
+    }
+
+    .admin-header p {
+      font-size: 12px;
+      color: #3f5f7a;
+      margin-top: 2px;
+      transition: opacity 0.3s, max-height 0.3s;
+    }
+
+    .admin-header.scrolled p {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 40px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: .82rem;
+      cursor: pointer;
+      transition: all .25s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .admin-header.scrolled .btn {
+      padding: 8px 16px;
+      font-size: .78rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0077be, #005a9c);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 119, 190, .25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 119, 190, .35);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, .25);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #065f46;
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 30px rgba(6, 95, 70, 0.4);
+      z-index: 2000;
+      opacity: 0;
+      transition: all 0.35s ease;
+      max-width: 90%;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.error {
+      background: #991b1b;
+      box-shadow: 0 12px 30px rgba(153, 27, 27, 0.4);
+    }
+
+    .toast.info {
+      background: #1e40af;
+      box-shadow: 0 12px 30px rgba(30, 64, 175, 0.4);
+    }
+
+    .editor-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 22px 26px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 22px rgba(0, 55, 100, .07);
+      border-left: 5px solid var(--cloud-blue);
+    }
+
+    .editor-card h3 {
+      font-size: 15px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px dashed #cde0f0;
+      color: var(--cloud-deep);
+    }
+
+    .editor-card h3::before {
+      content: "✎";
+      color: var(--cloud-blue);
+      font-size: 16px;
+    }
+
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0077be, #005a9c);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-right: 6px;
+      letter-spacing: .5px;
+      box-shadow: 0 2px 6px rgba(0, 119, 190, .3);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f5fa;
+    }
+
+    .field-row:last-child {
+      border-bottom: none;
+    }
+
+    .field-row label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1a3e60;
+      padding-top: 10px;
+      letter-spacing: .2px;
+    }
+
+    .field-row input[type="text"],
+    .field-row textarea {
+      width: 100%;
+      border: 1.5px solid #bfd6ec;
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: var(--cloud-frost);
+      color: var(--cloud-deep);
+      font: inherit;
+      font-size: 13px;
+      transition: all .2s;
+      resize: vertical;
+    }
+
+    .field-row input[type="text"]:focus,
+    .field-row textarea:focus {
+      outline: none;
+      border-color: var(--cloud-blue);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(0, 119, 190, .1);
+    }
+
+    .field-row textarea {
+      min-height: 70px;
+    }
+
+    .image-upload-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .image-preview-box {
+      border: 2px dashed #b8d4f0;
+      border-radius: 18px;
+      padding: 0;
+      background: #f8fcff;
+      transition: all .2s;
+      overflow: hidden;
+      box-shadow: 0 8px 22px rgba(0, 119, 190, .13);
+    }
+
+    .image-preview-box:hover {
+      border-color: var(--cloud-blue);
+      box-shadow: 0 12px 28px rgba(0, 119, 190, .2);
+    }
+
+    .image-preview-box img {
+      display: block;
+      background: #f8fcff;
+    }
+
+    .image-preview-box .placeholder {
+      color: #8aa3bd;
+      font-size: 13px;
+      font-style: italic;
+      padding: 30px 20px;
+      text-align: center;
+      display: block;
+    }
+
+    .upload-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .upload-controls input[type="file"] {
+      display: none;
+    }
+
+    .upload-btn {
+      background: linear-gradient(135deg, #0077be, #005a9c);
+      color: #fff;
+      padding: 9px 18px;
+      border-radius: 30px;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all .2s;
+      border: 0;
+      box-shadow: 0 4px 10px rgba(0, 119, 190, .2);
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 119, 190, .3);
+    }
+
+    .remove-btn {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 9px 18px;
+      border-radius: 30px;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #fca5a5;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all .2s;
+    }
+
+    .remove-btn:hover {
+      background: #fecaca;
+    }
+
+    .hint-text {
+      font-size: 11.5px;
+      color: #6b8aad;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    .resize-panel {
+      background: linear-gradient(145deg, #f4faff 0%, #e8f3ff 100%);
+      border: 1.5px solid #cde0f0;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-top: 12px;
+    }
+
+    .resize-panel h4 {
+      font-size: 12px;
+      color: var(--cloud-blue);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .resize-panel h4::before {
+      content: "⚙";
+      font-size: 14px;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 70px;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .control-row label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1a3e60;
+      padding: 0;
+    }
+
+    .control-row input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #0077be 0%, #4a9fd8 100%);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .control-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--cloud-blue);
+      box-shadow: 0 2px 6px rgba(0, 119, 190, .4);
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .control-row input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 4px 12px rgba(0, 119, 190, .6);
+    }
+
+    .control-row input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--cloud-blue);
+      box-shadow: 0 2px 6px rgba(0, 119, 190, .4);
+      cursor: pointer;
+    }
+
+    .control-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cloud-blue);
+      text-align: right;
+      padding: 4px 10px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #cde0f0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .preset-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .preset-btn {
+      background: #fff;
+      border: 1.5px solid #b8d4f0;
+      color: var(--cloud-deep);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preset-btn:hover {
+      background: var(--cloud-blue);
+      color: #fff;
+      border-color: var(--cloud-blue);
+      transform: translateY(-1px);
+    }
+
+    .preset-btn.active {
+      background: var(--cloud-blue);
+      color: #fff;
+      border-color: var(--cloud-blue);
+    }
+
+    .select-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .select-row label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1a3e60;
+      padding: 0;
+    }
+
+    .select-row select {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1.5px solid #bfd6ec;
+      background: #fff;
+      color: var(--cloud-deep);
+      font: inherit;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .select-row select:focus {
+      outline: none;
+      border-color: var(--cloud-blue);
+      box-shadow: 0 0 0 4px rgba(0, 119, 190, .1);
+    }
+
+    .align-group {
+      display: flex;
+      gap: 6px;
+    }
+
+    .align-btn {
+      flex: 1;
+      padding: 8px;
+      border: 1.5px solid #b8d4f0;
+      background: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #1a3e60;
+      transition: all .2s;
+    }
+
+    .align-btn:hover {
+      background: #e8f3ff;
+      border-color: var(--cloud-blue);
+    }
+
+    .align-btn.active {
+      background: var(--cloud-blue);
+      color: #fff;
+      border-color: var(--cloud-blue);
+    }
+
+    .reset-resize-btn {
+      background: #fff5e6;
+      border: 1.5px solid #fcd9a0;
+      color: #92400e;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .reset-resize-btn:hover {
+      background: #fef3e2;
+      border-color: #f59e0b;
+    }
+
+    @media (max-width:700px) {
+      .admin-header {
+        padding: 12px 16px;
+        border-radius: 0 0 18px 18px;
+      }
+
+      .admin-header h1 {
+        font-size: 16px;
+      }
+
+      .admin-header h1::before {
+        font-size: 22px;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .field-row label {
+        padding-top: 0;
+      }
+
+      .control-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .control-value {
+        text-align: center;
+      }
+
+      .select-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="admin-wrapper">
+
+    <!-- ⭐ STICKY HEADER — Save Draft, Preview, Reset lang ⭐ -->
+    <div class="admin-header" id="adminHeader">
+      <div>
+        <h1>Contract Editor</h1>
+        <p>I-edit ang content, image, at layout ng contract.</p>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-success" onclick="saveLocal()"><i class="fas fa-save"></i> Save Draft</button>
+        <a href="index.html" target="_blank" class="btn btn-primary"><i class="fas fa-eye"></i> Preview</a>
+        <button class="btn btn-danger" onclick="resetAll()"><i class="fas fa-undo"></i> Reset</button>
+      </div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="editor-card">
+      <h3><span class="section-badge">📄 HEADER</span> Contract Header</h3>
+      <div class="field-row">
+        <label>Title</label>
+        <input type="text" data-key="headerTitle">
+      </div>
+      <div class="field-row">
+        <label>Subtitle</label>
+        <input type="text" data-key="headerSubtitle">
+      </div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="editor-card">
+      <h3><span class="section-badge">1</span> Client Information</h3>
+      <div class="field-row">
+        <label>Section Title</label>
+        <input type="text" data-key="sec1_title">
+      </div>
+      <div class="field-row">
+        <label>Introduction</label>
+        <input type="text" data-key="sec1_intro">
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="editor-card">
+      <h3><span class="section-badge">2</span> Purpose of the Partnership</h3>
+      <div class="field-row">
+        <label>Section Title</label>
+        <input type="text" data-key="sec2_title">
+      </div>
+      <div class="field-row">
+        <label>Paragraph 1<br><span style="font-weight:400;color:#6b8aad;font-size:11px;">(placeholders: [ORGANIZATION],
+            [REPRESENTATIVE], [TYPE])</span></label>
+        <textarea data-key="sec2_p1" rows="3"></textarea>
+      </div>
+      <div class="field-row">
+        <label>Paragraph 2<br><span style="font-weight:400;color:#6b8aad;font-size:11px;">(placeholder:
+            [FOCUS])</span></label>
+        <textarea data-key="sec2_p2" rows="3"></textarea>
+      </div>
+      <div class="field-row">
+        <label>Paragraph 3</label>
+        <textarea data-key="sec2_p3" rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 3 with IMAGE -->
+    <div class="editor-card">
+      <h3><span class="section-badge">3</span> Collaboration Details</h3>
+
+      <div class="field-row">
+        <label>Section Title</label>
+        <input type="text" data-key="sec3_title">
+      </div>
+      <div class="field-row">
+        <label>Introduction</label>
+        <input type="text" data-key="sec3_intro">
+      </div>
+
+      <div class="field-row">
+        <label>Hero Image<br><span style="font-weight:400;color:#6b8aad;font-size:11px;">(JPG, PNG, WEBP — max
+            2MB)</span></label>
+        <div class="image-upload-area">
+          <div class="image-preview-box" id="imagePreviewBox">
+            <span class="placeholder">No image uploaded — gamitin ang default na "Virtual Lab.png"</span>
+          </div>
+          <div class="upload-controls">
+            <label for="imageUpload" class="upload-btn">
+              <i class="fas fa-upload"></i> Choose Image
+            </label>
+            <input type="file" id="imageUpload" accept="image/*">
+            <button type="button" class="remove-btn" onclick="removeImage()">
+              <i class="fas fa-trash"></i> Remove / Reset
+            </button>
+          </div>
+          <p class="hint-text">💡 Yung preview na ito ay <strong>exact match</strong> sa index.html.</p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label>Image Size & Position</label>
+        <div class="resize-panel">
+          <h4>Resize Controls</h4>
+
+          <div class="preset-row">
+            <button type="button" class="preset-btn" data-preset="small" onclick="applyPreset('small')">
+              <i class="fas fa-compress"></i> Small (300px)
+            </button>
+            <button type="button" class="preset-btn active" data-preset="medium" onclick="applyPreset('medium')">
+              <i class="fas fa-expand"></i> Medium (600px)
+            </button>
+            <button type="button" class="preset-btn" data-preset="large" onclick="applyPreset('large')">
+              <i class="fas fa-expand-arrows-alt"></i> Large (900px)
+            </button>
+            <button type="button" class="preset-btn" data-preset="full" onclick="applyPreset('full')">
+              <i class="fas fa-arrows-alt-h"></i> Full Width
+            </button>
+          </div>
+
+          <div class="control-row">
+            <label>Max Width</label>
+            <input type="range" id="imgWidth" min="100" max="1000" step="10" value="600">
+            <span class="control-value" id="imgWidthVal">600px</span>
+          </div>
+          <div class="control-row">
+            <label>Max Height</label>
+            <input type="range" id="imgHeight" min="0" max="600" step="10" value="0">
+            <span class="control-value" id="imgHeightVal">Auto</span>
+          </div>
+          <div class="control-row">
+            <label>Corner Radius</label>
+            <input type="range" id="imgRadius" min="0" max="40" step="1" value="10">
+            <span class="control-value" id="imgRadiusVal">10px</span>
+          </div>
+
+          <div class="select-row">
+            <label>Object Fit</label>
+            <select id="imgFit" onchange="updatePreview()">
+              <option value="cover" selected>Cover (crop to fill)</option>
+              <option value="contain">Contain (fit whole)</option>
+              <option value="fill">Fill (stretch)</option>
+              <option value="none">None (original)</option>
+            </select>
+          </div>
+
+          <div class="select-row">
+            <label>Alignment</label>
+            <div class="align-group">
+              <button type="button" class="align-btn" data-align="left" onclick="setAlign('left')">
+                <i class="fas fa-align-left"></i> Left
+              </button>
+              <button type="button" class="align-btn active" data-align="center" onclick="setAlign('center')">
+                <i class="fas fa-align-center"></i> Center
+              </button>
+              <button type="button" class="align-btn" data-align="right" onclick="setAlign('right')">
+                <i class="fas fa-align-right"></i> Right
+              </button>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <label>Vertical Margin</label>
+            <input type="range" id="imgMargin" min="0" max="40" step="2" value="4">
+            <span class="control-value" id="imgMarginVal">4px</span>
+          </div>
+
+          <button type="button" class="reset-resize-btn" onclick="resetResize()">
+            <i class="fas fa-undo"></i> Reset Resize
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="editor-card">
+      <h3><span class="section-badge">4</span> Responsibilities of the Parties</h3>
+      <div class="field-row">
+        <label>Section Title</label>
+        <input type="text" data-key="sec4_title">
+      </div>
+      <div class="field-row">
+        <label>Partner Heading</label>
+        <input type="text" data-key="sec4_partner_title">
+      </div>
+      <div class="field-row">
+        <label>Partner Items<br><span style="font-weight:400;color:#6b8aad;font-size:11px;">(one per
+            line)</span></label>
+        <textarea data-key="sec4_partner_items" data-is-array="true" rows="6"></textarea>
+      </div>
+      <div class="field-row">
+        <label>CloudSwyft Heading</label>
+        <input type="text" data-key="sec4_cloud_title">
+      </div>
+      <div class="field-row">
+        <label>CloudSwyft Items<br><span style="font-weight:400;color:#6b8aad;font-size:11px;">(one per
+            line)</span></label>
+        <textarea data-key="sec4_cloud_items" data-is-array="true" rows="6"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="editor-card">
+      <h3><span class="section-badge">5</span> Confidentiality</h3>
+      <div class="field-row"><label>Section Title</label><input type="text" data-key="sec5_title"></div>
+      <div class="field-row"><label>Paragraph 1</label><textarea data-key="sec5_p1" rows="3"></textarea></div>
+      <div class="field-row"><label>Paragraph 2</label><textarea data-key="sec5_p2" rows="3"></textarea></div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="editor-card">
+      <h3><span class="section-badge">6</span> Changes to the Agreement</h3>
+      <div class="field-row"><label>Section Title</label><input type="text" data-key="sec6_title"></div>
+      <div class="field-row"><label>Paragraph 1</label><textarea data-key="sec6_p1" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 2</label><textarea data-key="sec6_p2" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 3</label><textarea data-key="sec6_p3" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 4</label><textarea data-key="sec6_p4" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 5</label><textarea data-key="sec6_p5" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 6</label><textarea data-key="sec6_p6" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 7</label><textarea data-key="sec6_p7" rows="2"></textarea></div>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="editor-card">
+      <h3><span class="section-badge">7</span> Duration and Termination</h3>
+      <div class="field-row"><label>Section Title</label><input type="text" data-key="sec7_title"></div>
+      <div class="field-row"><label>Paragraph 1</label><textarea data-key="sec7_p1" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 2</label><textarea data-key="sec7_p2" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 3</label><textarea data-key="sec7_p3" rows="2"></textarea></div>
+    </div>
+
+    <!-- SECTION 8 -->
+    <div class="editor-card">
+      <h3><span class="section-badge">8</span> Confirmation and Agreement</h3>
+      <div class="field-row"><label>Section Title</label><input type="text" data-key="sec8_title"></div>
+      <div class="field-row"><label>Paragraph 1</label><textarea data-key="sec8_p1" rows="2"></textarea></div>
+      <div class="field-row"><label>Paragraph 2</label><textarea data-key="sec8_p2" rows="3"></textarea></div>
+      <div class="field-row"><label>Paragraph 3</label><textarea data-key="sec8_p3" rows="4"></textarea></div>
+      <div class="field-row"><label>Paragraph 4</label><textarea data-key="sec8_p4" rows="2"></textarea></div>
+    </div>
+
+    <!-- SECTION 9 -->
+    <div class="editor-card">
+      <h3><span class="section-badge">9</span> Use and Reproduction of Materials</h3>
+      <div class="field-row"><label>Section Title</label><input type="text" data-key="sec9_title"></div>
+      <div class="field-row"><label>Paragraph 1</label><textarea data-key="sec9_p1" rows="3"></textarea></div>
+      <div class="field-row"><label>Paragraph 2</label><textarea data-key="sec9_p2" rows="3"></textarea></div>
+      <div class="field-row"><label>Paragraph 3</label><textarea data-key="sec9_p3" rows="3"></textarea></div>
+    </div>
+
+    <!-- SIGNATURES -->
+    <div class="editor-card">
+      <h3><span class="section-badge">✍</span> Signatures</h3>
+      <div class="field-row"><label>Client Title</label><input type="text" data-key="sig_client_title"></div>
+      <div class="field-row"><label>CloudSwyft Title</label><input type="text" data-key="sig_cloud_title"></div>
+    </div>
+
+    <!-- COMPLETION -->
+    <div class="editor-card">
+      <h3><span class="section-badge">✓</span> Completion & Footer</h3>
+      <div class="field-row"><label>Completion Title</label><input type="text" data-key="completion_title"></div>
+      <div class="field-row"><label>Completion Text</label><textarea data-key="completion_text" rows="3"></textarea>
+      </div>
+      <div class="field-row"><label>Footer Text</label><input type="text" data-key="footer_text"></div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i> <span id="toastMsg">Saved!</span>
+  </div>
+
+  <script>
+    const DEFAULT_CONTENT = {
+      headerTitle: "Client Contract",
+      headerSubtitle: "Creating opportunities through technology, digital learning, and collaboration.",
+      sec1_title: "1. CLIENT INFORMATION",
+      sec1_intro: "The Client shall provide the following information:",
+      sec2_title: "2. PURPOSE OF THE PARTNERSHIP / COLLABORATION",
+      sec2_p1: "This Agreement establishes the understanding between CloudSwyft Global Systems Inc. and [ORGANIZATION], represented by [REPRESENTATIVE], regarding their proposed [TYPE].",
+      sec2_p2: "The partnership/collaboration shall focus on [FOCUS], with the Parties working together toward the objectives and expected outcomes mutually agreed upon under this Agreement.",
+      sec2_p3: "The specific activities, responsibilities, resources, and other arrangements shall be determined based on the nature and scope of the partnership/collaboration.",
+      sec3_title: "3. COLLABORATION DETAILS",
+      sec3_intro: "The Client shall provide the following information regarding the proposed partnership or collaboration:",
+      sec4_title: "4. RESPONSIBILITIES OF THE PARTIES",
+      sec4_partner_title: "The Partner shall:",
+      sec4_partner_items: [
+        "Provide accurate and complete information relevant to the partnership or collaboration.",
+        "Participate in the agreed activities and initiatives.",
+        "Provide the necessary information, materials, or resources that have been mutually agreed upon.",
+        "Communicate relevant updates, concerns, or changes to CloudSwyft.",
+        "Comply with the mutually agreed terms for the partnership or collaboration."
+      ],
+      sec4_cloud_title: "CloudSwyft shall:",
+      sec4_cloud_items: [
+        "Coordinate with the Partner regarding the agreed partnership or collaboration.",
+        "Participate in the mutually agreed activities and initiatives.",
+        "Provide relevant information and resources that have been agreed upon by both parties.",
+        "Communicate relevant updates and requirements to the Partner.",
+        "Work with the Partner toward the agreed objectives of the collaboration."
+      ],
+      sec5_title: "5. CONFIDENTIALITY",
+      sec5_p1: "The Partner and CloudSwyft shall maintain the confidentiality of non-public information shared in connection with the partnership or collaboration.",
+      sec5_p2: "Neither party shall disclose confidential information to unauthorized individuals or organizations unless otherwise agreed upon or required by applicable law.",
+      sec6_title: "6. CHANGES TO THE AGREEMENT",
+      sec6_p1: "The Partner and CloudSwyft shall agree in writing to any significant changes to the purpose, scope, responsibilities, or other terms of this Agreement.",
+      sec6_p2: "Additional activities or initiatives may be included upon mutual agreement.",
+      sec6_p3: "The Parties shall communicate with each other regarding any proposed changes to the partnership or collaboration.",
+      sec6_p4: "Any changes to the purpose, scope, activities, responsibilities, timeline, or other significant terms of this Agreement shall be discussed and mutually agreed upon by the Parties.",
+      sec6_p5: "The Partner shall not be required to undertake additional activities or responsibilities that were not included in the original agreement unless such changes have been mutually agreed upon.",
+      sec6_p6: "Where necessary, the Parties shall document the agreed changes through a written amendment, updated agreement, or other form of documented approval.",
+      sec6_p7: "Any approved changes shall form part of the Agreement and shall be followed by both Parties.",
+      sec7_title: "7. DURATION AND TERMINATION",
+      sec7_p1: "This Agreement may be terminated before the expected end date by either Party upon written notice to the other Party.",
+      sec7_p2: "Upon termination, the Parties shall communicate regarding any ongoing activities, responsibilities, or commitments that need to be completed or addressed.",
+      sec7_p3: "Any provisions of this Agreement that are intended to remain in effect after termination, including confidentiality and intellectual property obligations, shall continue to apply.",
+      sec8_title: "8. CONFIRMATION AND AGREEMENT",
+      sec8_p1: "The Partner shall confirm that all information provided in this Agreement is accurate and complete.",
+      sec8_p2: "By completing the required information and providing an electronic signature, the Partner acknowledges that the Partner has read, understood, and agreed to the terms and conditions of this Agreement.",
+      sec8_p3: "The Partner further acknowledges that the proposed partnership, collaboration, project, or initiative has been discussed and mutually understood by both Parties. The Partner agrees to fulfill the responsibilities and commitments mutually agreed upon with CloudSwyft, and understands that any additional activities, commitments, or changes shall be subject to mutual agreement between the Parties.",
+      sec8_p4: "By providing an electronic signature, the authorized representatives acknowledge their agreement to the terms stated in this Agreement.",
+      sec9_title: "9. USE AND REPRODUCTION OF CLOUDSWYFT MATERIALS",
+      sec9_p1: "The Client shall not reproduce, copy, modify, distribute, publish, or otherwise use the CloudSwyft name, logo, branding, documents, materials, or other proprietary content provided in connection with this Agreement without the prior written consent of CloudSwyft Global Systems Inc.",
+      sec9_p2: "The CloudSwyft name, logo, and other materials included in this Agreement are provided solely for the purpose of reviewing and completing the proposed partnership or collaboration.",
+      sec9_p3: "Any permitted use following the execution of this Agreement shall remain subject to the terms and conditions agreed upon by the Parties.",
+      sig_client_title: "CLIENT",
+      sig_cloud_title: "CLOUDSWYFT GLOBAL SYSTEMS INC.",
+      completion_title: "AGREEMENT COMPLETION",
+      completion_text: "Once the required information has been completed and the authorized representatives have provided their electronic signatures, the completed Agreement shall be retained by the Parties for reference.",
+      footer_text: "Thank you for partnering with CloudSwyft.",
+      section3Image: null,
+      section3ImageSettings: {
+        width: 600,
+        height: 0,
+        radius: 10,
+        fit: "cover",
+        align: "center",
+        margin: 4
+      }
+    };
+
+    const STORAGE_KEY = "cloudswyft_contract_content";
+
+    let pendingImage = null;
+    let pendingSettings = { ...DEFAULT_CONTENT.section3ImageSettings };
+
+    function getCurrentContent() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return { ...DEFAULT_CONTENT, section3ImageSettings: { ...DEFAULT_CONTENT.section3ImageSettings } };
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          ...DEFAULT_CONTENT,
+          ...parsed,
+          section3ImageSettings: {
+            ...DEFAULT_CONTENT.section3ImageSettings,
+            ...(parsed.section3ImageSettings || {})
+          }
+        };
+      } catch (e) {
+        return { ...DEFAULT_CONTENT, section3ImageSettings: { ...DEFAULT_CONTENT.section3ImageSettings } };
+      }
+    }
+
+    function renderEditor() {
+      const content = getCurrentContent();
+
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const key = el.dataset.key;
+        const val = content[key];
+        const isArray = el.dataset.isArray === "true";
+        if (isArray) {
+          el.value = Array.isArray(val) ? val.join("\n") : (val || "");
+        } else {
+          el.value = val || "";
+        }
+      });
+
+      pendingImage = content.section3Image || null;
+      pendingSettings = { ...content.section3ImageSettings };
+
+      renderImagePreview();
+      syncControlsFromSettings();
+    }
+
+    function renderImagePreview() {
+      const box = document.getElementById("imagePreviewBox");
+      if (pendingImage) {
+        const s = pendingSettings;
+        const styles = [
+          `max-width: ${s.width}px`,
+          `width: 100%`,
+          `object-fit: ${s.fit}`,
+          `border-radius: ${s.radius}px`,
+          `margin-top: ${s.margin}px`,
+          `margin-bottom: ${s.margin}px`,
+          s.height > 0 ? `height: ${s.height}px` : `height: auto`,
+          s.height > 0 ? `max-height: ${s.height}px` : `max-height: none`
+        ];
+        if (s.align === "left") styles.push(`margin-left: 0`, `margin-right: auto`);
+        else if (s.align === "right") styles.push(`margin-left: auto`, `margin-right: 0`);
+        else styles.push(`margin-left: auto`, `margin-right: auto`);
+
+        box.innerHTML = `<img src="${pendingImage}" alt="Preview" style="${styles.join(';')}">`;
+        box.style.textAlign = s.align;
+      } else {
+        box.innerHTML = `<span class="placeholder">No image uploaded — gamitin ang default na "Virtual Lab.png"</span>`;
+      }
+    }
+
+    function syncControlsFromSettings() {
+      const s = pendingSettings;
+      document.getElementById("imgWidth").value = s.width;
+      document.getElementById("imgHeight").value = s.height;
+      document.getElementById("imgRadius").value = s.radius;
+      document.getElementById("imgFit").value = s.fit;
+      document.getElementById("imgMargin").value = s.margin;
+
+      document.getElementById("imgWidthVal").textContent = s.width + "px";
+      document.getElementById("imgHeightVal").textContent = s.height > 0 ? s.height + "px" : "Auto";
+      document.getElementById("imgRadiusVal").textContent = s.radius + "px";
+      document.getElementById("imgMarginVal").textContent = s.margin + "px";
+
+      document.querySelectorAll(".align-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.align === s.align);
+      });
+
+      let activePreset = "";
+      if (s.width <= 320) activePreset = "small";
+      else if (s.width <= 650) activePreset = "medium";
+      else if (s.width <= 950) activePreset = "large";
+      else activePreset = "full";
+      document.querySelectorAll(".preset-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.preset === activePreset);
+      });
+    }
+
+    function updatePreview() {
+      pendingSettings.width = parseInt(document.getElementById("imgWidth").value, 10);
+      pendingSettings.height = parseInt(document.getElementById("imgHeight").value, 10);
+      pendingSettings.radius = parseInt(document.getElementById("imgRadius").value, 10);
+      pendingSettings.fit = document.getElementById("imgFit").value;
+      pendingSettings.margin = parseInt(document.getElementById("imgMargin").value, 10);
+
+      document.getElementById("imgWidthVal").textContent = pendingSettings.width + "px";
+      document.getElementById("imgHeightVal").textContent = pendingSettings.height > 0 ? pendingSettings.height + "px" : "Auto";
+      document.getElementById("imgRadiusVal").textContent = pendingSettings.radius + "px";
+      document.getElementById("imgMarginVal").textContent = pendingSettings.margin + "px";
+
+      renderImagePreview();
+    }
+
+    function applyPreset(preset) {
+      const s = pendingSettings;
+      if (preset === "small") { s.width = 300; s.height = 0; s.fit = "cover"; }
+      if (preset === "medium") { s.width = 600; s.height = 0; s.fit = "cover"; }
+      if (preset === "large") { s.width = 900; s.height = 0; s.fit = "cover"; }
+      if (preset === "full") { s.width = 1000; s.height = 0; s.fit = "cover"; }
+
+      document.getElementById("imgWidth").value = s.width;
+      document.getElementById("imgHeight").value = s.height;
+      document.getElementById("imgFit").value = s.fit;
+      updatePreview();
+      syncControlsFromSettings();
+      showToast("🎨 Preset applied: " + preset.toUpperCase(), false);
+    }
+
+    function setAlign(align) {
+      pendingSettings.align = align;
+      document.querySelectorAll(".align-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.align === align);
+      });
+      renderImagePreview();
+    }
+
+    function resetResize() {
+      pendingSettings = { ...DEFAULT_CONTENT.section3ImageSettings };
+      syncControlsFromSettings();
+      renderImagePreview();
+      showToast("🔄 Reset resize settings.", false);
+    }
+
+    ["imgWidth", "imgHeight", "imgRadius", "imgMargin"].forEach(id => {
+      document.addEventListener("input", e => {
+        if (e.target && e.target.id === id) updatePreview();
+      });
+    });
+    document.addEventListener("change", e => {
+      if (e.target && e.target.id === "imgFit") updatePreview();
+    });
+
+    document.getElementById("imageUpload").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        showToast("❌ Please select a valid image file.", true);
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        showToast("❌ Image too large. Max 2MB lang.", true);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        pendingImage = ev.target.result;
+        renderImagePreview();
+        showToast("🖼️ Image selected — click Save para permanent.", false);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function removeImage() {
+      pendingImage = null;
+      document.getElementById("imageUpload").value = "";
+      renderImagePreview();
+      showToast("🗑️ Image removed.", false);
+    }
+
+    function buildContent() {
+      const inputs = document.querySelectorAll("[data-key]");
+      const content = { ...DEFAULT_CONTENT };
+
+      inputs.forEach(el => {
+        const key = el.dataset.key;
+        const isArray = el.dataset.isArray === "true";
+        let val = el.value;
+        if (isArray) val = val.split("\n").map(s => s.trim()).filter(Boolean);
+        content[key] = val;
+      });
+
+      content.section3Image = pendingImage;
+      content.section3ImageSettings = { ...pendingSettings };
+
+      return content;
+    }
+
+    function saveLocal() {
+      const content = buildContent();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+        showToast("💾 Draft saved locally!", false);
+      } catch (e) {
+        if (e.name === "QuotaExceededError") {
+          showToast("❌ Image too large para sa localStorage. Try smaller image.", true);
+        } else {
+          showToast("❌ Error: " + e.message, true);
+        }
+      }
+    }
+
+    function showToast(msg, isError) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastMsg").textContent = msg;
+      toast.classList.remove("error", "info");
+      if (isError) toast.classList.add("error");
+      toast.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => toast.classList.remove("show"), 4000);
+    }
+
+    function resetAll() {
+      if (!confirm("Reset lahat ng edits? Kasama na yung image at resize settings.")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      pendingImage = null;
+      pendingSettings = { ...DEFAULT_CONTENT.section3ImageSettings };
+      renderEditor();
+      showToast("🔄 Reset sa default.", false);
+    }
+
+    /* ⭐ Scroll detection — para mag-shrink yung sticky header ⭐ */
+    window.addEventListener("scroll", () => {
+      const header = document.getElementById("adminHeader");
+      const currentScroll = window.pageYOffset;
+
+      if (currentScroll > 30) {
+        header.classList.add("scrolled");
+      } else {
+        header.classList.remove("scrolled");
+      }
+    }, { passive: true });
+
+    renderEditor();
+  </script>
+</body>
+
+</html>
