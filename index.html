@@ -1,672 +1,1045 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CloudSwyft · Client Contract</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-  @page { size: A4; margin: 14mm; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --cloud-blue:#0077be; --cloud-deep:#0a2a4a; --cloud-soft:#e6f0fa;
-    --cloud-sky:#4a9fd8; --cloud-accent:#d4e9ff; --cloud-white:#fff;
-    --cloud-frost:#f5faff; --cloud-shadow:rgba(0,119,190,.12);
-  }
-  body {
-    background:linear-gradient(145deg,#f0f7fe 0%,#dae9f7 100%);
-    color:#0a2a4a; font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-    line-height:1.55; padding:28px 16px; min-height:100vh;
-    position:relative; overflow-x:hidden;
-  }
-  .bg-deco { position:fixed; z-index:0; pointer-events:none; opacity:.18; }
-  .bg-deco img { display:block; width:100%; height:auto; }
-  .bg-1 { top:-20px; left:-30px; width:340px; }
-  .bg-2 { top:-20px; right:-80px; width:380px; }
-  .bg-3 { bottom:-30px; left:-30px; width:360px; }
-  .bg-4 { bottom:-30px; right:-60px; width:340px; }
-  .contract-wrapper { max-width:880px; margin:0 auto; position:relative; z-index:1; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudSwyft · Client Contract</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @page {
+            size: A4;
+            margin: 14mm;
+        }
 
-  /* ⭐ TOOLBAR — nasa ILALIM na ngayon ⭐ */
-  .toolbar {
-    display:flex; gap:12px; justify-content:center;
-    margin-top:24px;
-    margin-bottom:0;
-    flex-wrap:wrap;
-  }
-  .toolbar button {
-    border:0; border-radius:40px; padding:14px 32px; font-weight:600;
-    font-size:1rem; cursor:pointer; transition:all .25s;
-    box-shadow:0 8px 20px var(--cloud-shadow);
-    display:inline-flex; align-items:center; gap:10px;
-    background:linear-gradient(135deg,#0077be,#005a9c); color:#fff;
-    border:1px solid rgba(255,255,255,.2);
-  }
-  .toolbar button:hover {
-    background:linear-gradient(135deg,#0088d0,#0068b0);
-    box-shadow:0 12px 28px rgba(0,119,190,.35); transform:translateY(-2px);
-  }
-  .clear-btn {
-    border:0; border-radius:40px;
-    background:var(--cloud-accent); color:var(--cloud-deep);
-    padding:8px 16px; font-size:.8rem;
-    box-shadow:none; border:1px solid #b8d4f0;
-    cursor:pointer; transition:all .2s;
-    display:inline-flex; align-items:center; gap:8px;
-  }
-  .clear-btn:hover { background:#c2dcf5; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  .contract {
-    background:rgba(255,255,255,.88); backdrop-filter:blur(14px);
-    border-radius:32px; padding:48px 56px;
-    box-shadow:0 30px 50px rgba(0,55,100,.15), 0 12px 25px rgba(0,0,0,.05);
-    position:relative; overflow:hidden;
-    border:1px solid rgba(255,255,255,.8);
-  }
-  .contract::before {
-    content:"☁"; position:absolute; top:-20px; right:20px;
-    font-size:220px; color:rgba(0,119,190,.04);
-    font-family:'Segoe UI',sans-serif; line-height:1;
-    pointer-events:none; z-index:0; transform:rotate(6deg); font-weight:300;
-  }
-  .contract::after {
-    content:"☁"; position:absolute; bottom:-40px; left:-20px;
-    font-size:260px; color:rgba(0,119,190,.025);
-    font-family:'Segoe UI',sans-serif; line-height:1;
-    pointer-events:none; z-index:0; transform:rotate(-8deg);
-  }
-  .contract > * { position:relative; z-index:1; }
+        :root {
+            --cloud-blue: #0077be;
+            --cloud-deep: #0a2a4a;
+            --cloud-soft: #e6f0fa;
+            --cloud-sky: #4a9fd8;
+            --cloud-accent: #d4e9ff;
+            --cloud-white: #fff;
+            --cloud-frost: #f5faff;
+            --cloud-shadow: rgba(0, 119, 190, .12);
+        }
 
-  .contract-header {
-    display:flex; align-items:center; justify-content:space-between;
-    gap:25px; padding-bottom:25px;
-    border-bottom:4px solid var(--cloud-blue); margin-bottom:30px;
-  }
-  .brand { display:flex; align-items:center; gap:14px; min-width:220px; }
-  .brand-logo {
-    height:62px; width:auto; max-width:260px; object-fit:contain;
-    display:block; filter:drop-shadow(0 4px 8px rgba(0,119,190,.15));
-  }
-  .header-title { text-align:right; }
-  .header-title h2 {
-    margin:0 0 4px; color:var(--cloud-deep); font-size:28px; font-weight:700;
-    letter-spacing:-.02em; text-shadow:0 2px 4px rgba(0,119,190,.08);
-  }
-  .header-title p { margin:0; font-size:12px; color:#3f5f7a; }
+        body {
+            background: linear-gradient(145deg, #f0f7fe 0%, #dae9f7 100%);
+            color: #0a2a4a;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.55;
+            padding: 28px 16px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-  section { margin-bottom:32px; page-break-inside:avoid; }
-  h3 {
-    color:var(--cloud-deep); font-size:15px; font-weight:700;
-    letter-spacing:.4px; margin:0 0 14px; padding-bottom:8px;
-    border-bottom:2px solid #cde0f0;
-    display:flex; align-items:center; gap:10px;
-  }
-  h3::before {
-    content:"●"; color:var(--cloud-blue); font-size:14px;
-    filter:drop-shadow(0 1px 2px rgba(0,119,190,.3));
-  }
-  h4 { color:var(--cloud-deep); margin:0 0 16px; font-size:15px; font-weight:700; }
-  p { margin:0 0 12px; font-size:13.5px; text-align:justify; color:#143450; }
-  ul { margin:8px 0 12px 20px; padding-left:10px; }
-  li { margin-bottom:7px; font-size:13.5px; color:#143450; }
+        .bg-deco {
+            position: fixed;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .18;
+        }
 
-  .section-hero {
-    margin:4px 0 20px;
-    text-align: center;
-  }
-  .section-hero img {
-    display:block;
-    background:#f8fcff;
-    box-shadow: 0 8px 22px rgba(0,119,190,.13);
-    border: 1px solid #cfe2f3;
-  }
+        .bg-deco img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
 
-  .form-grid {
-    display:grid; grid-template-columns:1fr 1fr;
-    gap:18px 20px; margin-top:16px;
-  }
-  .form-grid .full { grid-column:1 / -1; }
-  label {
-    display:block; color:#1a3e60; font-size:12.5px;
-    font-weight:600; letter-spacing:.2px; margin-bottom:4px;
-  }
-  input, textarea {
-    display:block; width:100%; margin-top:4px;
-    border:1.5px solid #bfd6ec; border-radius:16px;
-    padding:12px 16px; background:var(--cloud-frost);
-    color:var(--cloud-deep); font:inherit; font-size:13px;
-    transition:all .2s; box-shadow:inset 0 2px 4px rgba(0,50,100,.02);
-  }
-  input:focus, textarea:focus {
-    outline:none; border-color:var(--cloud-blue); background:#fff;
-    box-shadow:0 0 0 5px rgba(0,119,190,.1);
-  }
-  textarea {
-    min-height:90px; resize:vertical; border-radius:18px;
-    field-sizing:content; max-height:400px; overflow-y:auto;
-  }
+        .bg-1 {
+            top: -20px;
+            left: -30px;
+            width: 340px;
+        }
 
-  .inline-fill {
-    display:inline; min-width:100px; padding:2px 6px;
-    border-bottom:2px solid #9bb8d4; background:transparent;
-    font-size:13px; font-weight:500; color:var(--cloud-deep);
-    font-family:inherit; line-height:inherit;
-    border-radius:6px 6px 0 0;
-    white-space:normal; word-wrap:break-word;
-    overflow-wrap:break-word; word-break:break-word;
-    cursor:text; outline:none;
-  }
-  .inline-fill:focus {
-    border-bottom-color:var(--cloud-blue);
-    background:rgba(0,119,190,.05);
-  }
-  .inline-fill:empty::before {
-    content:attr(data-placeholder);
-    color:#8aa3bd; font-style:italic; font-weight:400;
-  }
+        .bg-2 {
+            top: -20px;
+            right: -80px;
+            width: 380px;
+        }
 
-  .signatures {
-    display:grid; grid-template-columns:1fr 1fr; gap:35px;
-    margin-top:40px; page-break-inside:avoid;
-  }
-  .signature-card {
-    background:linear-gradient(145deg,#fff 0%,#f4faff 100%);
-    border-radius:26px; padding:24px 22px 20px;
-    border:1px solid #d4e6f7;
-    box-shadow:0 8px 20px rgba(0,90,150,.06);
-  }
-  .signature-card h4 {
-    font-size:14px; margin-bottom:14px; color:var(--cloud-deep);
-    border-left:5px solid var(--cloud-blue); padding-left:12px;
-  }
-  .signature-card label { margin-bottom:8px; font-size:12px; color:#1f4a70; }
-  .signature-pad {
-    display:block; width:100%; height:100px; margin:8px 0;
-    border:1.8px dashed #92b8d8; border-radius:20px;
-    background:#fff; touch-action:none; cursor:crosshair;
-    box-shadow:inset 0 2px 6px rgba(0,50,100,.02);
-  }
-  .signature-pad:hover { border-color:var(--cloud-blue); }
+        .bg-3 {
+            bottom: -30px;
+            left: -30px;
+            width: 360px;
+        }
 
-  footer {
-    margin-top:38px; padding-top:20px;
-    border-top:2px solid #cde0f0; text-align:center;
-    color:var(--cloud-deep); font-weight:600; font-size:14px;
-  }
-  footer p {
-    text-align:center; margin:0; font-size:14px;
-    color:var(--cloud-deep); font-weight:600; letter-spacing:.4px;
-  }
-  footer p::before { content:"☁ "; color:var(--cloud-blue); font-size:16px; }
-  footer p::after { content:" ☁"; color:var(--cloud-blue); font-size:16px; }
+        .bg-4 {
+            bottom: -30px;
+            right: -60px;
+            width: 340px;
+        }
 
-  @media (max-width:700px) {
-    body { padding:12px 10px; }
-    .contract { padding:28px 20px; border-radius:26px; }
-    .contract-header { flex-direction:column; align-items:flex-start; gap:14px; }
-    .header-title { text-align:left; }
-    .form-grid, .signatures { grid-template-columns:1fr; gap:24px; }
-    .form-grid .full { grid-column:auto; }
-    .toolbar button { padding: 12px 24px; font-size: .9rem; }
-  }
+        .contract-wrapper {
+            max-width: 880px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
 
-  @media print {
-    @page { size:A4; margin:14mm; }
-    html, body {
-      background:#fff !important; padding:0 !important; margin:0 !important;
-      font-size:12px; width:100%; height:auto;
-    }
-    .bg-deco, .no-print, .toolbar, .clear-btn { display:none !important; }
-    .contract-wrapper { padding:0 !important; max-width:100% !important; }
-    .contract {
-      box-shadow:none !important; border-radius:0 !important;
-      padding:0 !important; border:none !important;
-      background:transparent !important; backdrop-filter:none !important;
-    }
-    .contract::before, .contract::after { display:none !important; }
-    input, textarea {
-      border:0 !important; border-bottom:1.5px solid #777 !important;
-      background:transparent !important; box-shadow:none !important;
-      padding-left:0 !important; padding-right:0 !important;
-      border-radius:0 !important; color:#000 !important;
-    }
-    textarea {
-      border:1.5px solid #777 !important; padding:6px !important;
-      border-radius:8px !important;
-    }
-    .inline-fill {
-      border-bottom:1px solid #777 !important;
-      background:transparent !important;
-      padding:2px 4px !important; color:#000 !important;
-    }
-    .inline-fill:empty::before { content:""; }
-    .signature-pad {
-      border:1.5px solid #777 !important; border-radius:12px !important;
-      background:#fff !important;
-    }
-    section, .signatures, .signature-card { page-break-inside:avoid; }
-  }
-</style>
+        /* ⭐ TOOLBAR — nasa ILALIM na ngayon ⭐ */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+            margin-bottom: 0;
+            flex-wrap: wrap;
+        }
+
+        .toolbar button {
+            border: 0;
+            border-radius: 40px;
+            padding: 14px 32px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all .25s;
+            box-shadow: 0 8px 20px var(--cloud-shadow);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #0077be, #005a9c);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, .2);
+        }
+
+        .toolbar button:hover {
+            background: linear-gradient(135deg, #0088d0, #0068b0);
+            box-shadow: 0 12px 28px rgba(0, 119, 190, .35);
+            transform: translateY(-2px);
+        }
+
+        .clear-btn {
+            border: 0;
+            border-radius: 40px;
+            background: var(--cloud-accent);
+            color: var(--cloud-deep);
+            padding: 8px 16px;
+            font-size: .8rem;
+            box-shadow: none;
+            border: 1px solid #b8d4f0;
+            cursor: pointer;
+            transition: all .2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-btn:hover {
+            background: #c2dcf5;
+        }
+
+        .contract {
+            background: rgba(255, 255, 255, .88);
+            backdrop-filter: blur(14px);
+            border-radius: 32px;
+            padding: 48px 56px;
+            box-shadow: 0 30px 50px rgba(0, 55, 100, .15), 0 12px 25px rgba(0, 0, 0, .05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, .8);
+        }
+
+        .contract::before {
+            content: "☁";
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-size: 220px;
+            color: rgba(0, 119, 190, .04);
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 0;
+            transform: rotate(6deg);
+            font-weight: 300;
+        }
+
+        .contract::after {
+            content: "☁";
+            position: absolute;
+            bottom: -40px;
+            left: -20px;
+            font-size: 260px;
+            color: rgba(0, 119, 190, .025);
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 0;
+            transform: rotate(-8deg);
+        }
+
+        .contract>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .contract-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            padding-bottom: 25px;
+            border-bottom: 4px solid var(--cloud-blue);
+            margin-bottom: 30px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 220px;
+        }
+
+        .brand-logo {
+            height: 62px;
+            width: auto;
+            max-width: 260px;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0, 119, 190, .15));
+        }
+
+        .header-title {
+            text-align: right;
+        }
+
+        .header-title h2 {
+            margin: 0 0 4px;
+            color: var(--cloud-deep);
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -.02em;
+            text-shadow: 0 2px 4px rgba(0, 119, 190, .08);
+        }
+
+        .header-title p {
+            margin: 0;
+            font-size: 12px;
+            color: #3f5f7a;
+        }
+
+        section {
+            margin-bottom: 32px;
+            page-break-inside: avoid;
+        }
+
+        h3 {
+            color: var(--cloud-deep);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: .4px;
+            margin: 0 0 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #cde0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3::before {
+            content: "●";
+            color: var(--cloud-blue);
+            font-size: 14px;
+            filter: drop-shadow(0 1px 2px rgba(0, 119, 190, .3));
+        }
+
+        h4 {
+            color: var(--cloud-deep);
+            margin: 0 0 16px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 0 0 12px;
+            font-size: 13.5px;
+            text-align: justify;
+            color: #143450;
+        }
+
+        ul {
+            margin: 8px 0 12px 20px;
+            padding-left: 10px;
+        }
+
+        li {
+            margin-bottom: 7px;
+            font-size: 13.5px;
+            color: #143450;
+        }
+
+        .section-hero {
+            margin: 4px 0 20px;
+            text-align: center;
+        }
+
+        .section-hero img {
+            display: block;
+            background: #f8fcff;
+            box-shadow: 0 8px 22px rgba(0, 119, 190, .13);
+            border: 1px solid #cfe2f3;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 20px;
+            margin-top: 16px;
+        }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            color: #1a3e60;
+            font-size: 12.5px;
+            font-weight: 600;
+            letter-spacing: .2px;
+            margin-bottom: 4px;
+        }
+
+        input,
+        textarea {
+            display: block;
+            width: 100%;
+            margin-top: 4px;
+            border: 1.5px solid #bfd6ec;
+            border-radius: 16px;
+            padding: 12px 16px;
+            background: var(--cloud-frost);
+            color: var(--cloud-deep);
+            font: inherit;
+            font-size: 13px;
+            transition: all .2s;
+            box-shadow: inset 0 2px 4px rgba(0, 50, 100, .02);
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--cloud-blue);
+            background: #fff;
+            box-shadow: 0 0 0 5px rgba(0, 119, 190, .1);
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+            border-radius: 18px;
+            field-sizing: content;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .inline-fill {
+            display: inline;
+            min-width: 100px;
+            padding: 2px 6px;
+            border-bottom: 2px solid #9bb8d4;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--cloud-deep);
+            font-family: inherit;
+            line-height: inherit;
+            border-radius: 6px 6px 0 0;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            cursor: text;
+            outline: none;
+        }
+
+        .inline-fill:focus {
+            border-bottom-color: var(--cloud-blue);
+            background: rgba(0, 119, 190, .05);
+        }
+
+        .inline-fill:empty::before {
+            content: attr(data-placeholder);
+            color: #8aa3bd;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+            margin-top: 40px;
+            page-break-inside: avoid;
+        }
+
+        .signature-card {
+            background: linear-gradient(145deg, #fff 0%, #f4faff 100%);
+            border-radius: 26px;
+            padding: 24px 22px 20px;
+            border: 1px solid #d4e6f7;
+            box-shadow: 0 8px 20px rgba(0, 90, 150, .06);
+        }
+
+        .signature-card h4 {
+            font-size: 14px;
+            margin-bottom: 14px;
+            color: var(--cloud-deep);
+            border-left: 5px solid var(--cloud-blue);
+            padding-left: 12px;
+        }
+
+        .signature-card label {
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #1f4a70;
+        }
+
+        .signature-pad {
+            display: block;
+            width: 100%;
+            height: 100px;
+            margin: 8px 0;
+            border: 1.8px dashed #92b8d8;
+            border-radius: 20px;
+            background: #fff;
+            touch-action: none;
+            cursor: crosshair;
+            box-shadow: inset 0 2px 6px rgba(0, 50, 100, .02);
+        }
+
+        .signature-pad:hover {
+            border-color: var(--cloud-blue);
+        }
+
+        footer {
+            margin-top: 38px;
+            padding-top: 20px;
+            border-top: 2px solid #cde0f0;
+            text-align: center;
+            color: var(--cloud-deep);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        footer p {
+            text-align: center;
+            margin: 0;
+            font-size: 14px;
+            color: var(--cloud-deep);
+            font-weight: 600;
+            letter-spacing: .4px;
+        }
+
+        footer p::before {
+            content: "☁ ";
+            color: var(--cloud-blue);
+            font-size: 16px;
+        }
+
+        footer p::after {
+            content: " ☁";
+            color: var(--cloud-blue);
+            font-size: 16px;
+        }
+
+        @media (max-width:700px) {
+            body {
+                padding: 12px 10px;
+            }
+
+            .contract {
+                padding: 28px 20px;
+                border-radius: 26px;
+            }
+
+            .contract-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .header-title {
+                text-align: left;
+            }
+
+            .form-grid,
+            .signatures {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .form-grid .full {
+                grid-column: auto;
+            }
+
+            .toolbar button {
+                padding: 12px 24px;
+                font-size: .9rem;
+            }
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 14mm;
+            }
+
+            html,
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-size: 12px;
+                width: 100%;
+                height: auto;
+            }
+
+            .bg-deco,
+            .no-print,
+            .toolbar,
+            .clear-btn {
+                display: none !important;
+            }
+
+            .contract-wrapper {
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .contract {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                backdrop-filter: none !important;
+            }
+
+            .contract::before,
+            .contract::after {
+                display: none !important;
+            }
+
+            input,
+            textarea {
+                border: 0 !important;
+                border-bottom: 1.5px solid #777 !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                border-radius: 0 !important;
+                color: #000 !important;
+            }
+
+            textarea {
+                border: 1.5px solid #777 !important;
+                padding: 6px !important;
+                border-radius: 8px !important;
+            }
+
+            .inline-fill {
+                border-bottom: 1px solid #777 !important;
+                background: transparent !important;
+                padding: 2px 4px !important;
+                color: #000 !important;
+            }
+
+            .inline-fill:empty::before {
+                content: "";
+            }
+
+            .signature-pad {
+                border: 1.5px solid #777 !important;
+                border-radius: 12px !important;
+                background: #fff !important;
+            }
+
+            section,
+            .signatures,
+            .signature-card {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="bg-deco bg-1" aria-hidden="true"><img src="1.png" alt=""></div>
-<div class="bg-deco bg-2" aria-hidden="true"><img src="2.png" alt=""></div>
-<div class="bg-deco bg-3" aria-hidden="true"><img src="3.png" alt=""></div>
-<div class="bg-deco bg-4" aria-hidden="true"><img src="4.png" alt=""></div>
+    <div class="bg-deco bg-1" aria-hidden="true"><img src="1.png" alt=""></div>
+    <div class="bg-deco bg-2" aria-hidden="true"><img src="2.png" alt=""></div>
+    <div class="bg-deco bg-3" aria-hidden="true"><img src="3.png" alt=""></div>
+    <div class="bg-deco bg-4" aria-hidden="true"><img src="4.png" alt=""></div>
 
-<div class="contract-wrapper">
+    <div class="contract-wrapper">
 
-  <!-- ⭐ CONTRACT (walang toolbar sa taas) ⭐ -->
-  <article class="contract">
+        <!-- ⭐ CONTRACT (walang toolbar sa taas) ⭐ -->
+        <article class="contract">
 
-    <header class="contract-header">
-      <div class="brand">
-        <img src="logo.png" alt="CloudSwyft" class="brand-logo"
-          onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:1.6rem;font-weight:700;color:#0077be;\'>☁ CloudSwyft</span>';">
-      </div>
-      <div class="header-title">
-        <h2 data-field="headerTitle">Client Contract</h2>
-        <p data-field="headerSubtitle">Creating opportunities through technology, digital learning, and collaboration.</p>
-      </div>
-    </header>
+            <header class="contract-header">
+                <div class="brand">
+                    <img src="logo.png" alt="CloudSwyft" class="brand-logo"
+                        onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:1.6rem;font-weight:700;color:#0077be;\'>☁ CloudSwyft</span>';">
+                </div>
+                <div class="header-title">
+                    <h2 data-field="headerTitle">Client Contract</h2>
+                    <p data-field="headerSubtitle">Creating opportunities through technology, digital learning, and
+                        collaboration.</p>
+                </div>
+            </header>
 
-    <section>
-      <h3 data-field="sec1_title">1. CLIENT INFORMATION</h3>
-      <p data-field="sec1_intro">The Client shall provide the following information:</p>
-      <div class="form-grid">
-        <label>Full Name / Authorized Representative:<input type="text" id="clientName" placeholder="Enter full name"></label>
-        <label>Organization / Institution:<input type="text" id="organization" placeholder="Enter organization / institution"></label>
-        <label>Position / Job Title:<input type="text" id="position" placeholder="Enter position / job title"></label>
-        <label>Email Address:<input type="email" id="email" placeholder="Enter email address"></label>
-        <label>Contact Number:<input type="tel" id="contact" placeholder="Enter contact number"></label>
-        <label>Date:<input type="date" id="clientDate"></label>
-      </div>
-    </section>
+            <section>
+                <h3 data-field="sec1_title">1. CLIENT INFORMATION</h3>
+                <p data-field="sec1_intro">The Client shall provide the following information:</p>
+                <div class="form-grid">
+                    <label>Full Name / Authorized Representative:<input type="text" id="clientName"
+                            placeholder="Enter full name"></label>
+                    <label>Organization / Institution:<input type="text" id="organization"
+                            placeholder="Enter organization / institution"></label>
+                    <label>Position / Job Title:<input type="text" id="position"
+                            placeholder="Enter position / job title"></label>
+                    <label>Email Address:<input type="email" id="email" placeholder="Enter email address"></label>
+                    <label>Contact Number:<input type="tel" id="contact" placeholder="Enter contact number"></label>
+                    <label>Date:<input type="date" id="clientDate"></label>
+                </div>
+            </section>
 
-    <section>
-      <h3 data-field="sec2_title">2. PURPOSE OF THE PARTNERSHIP / COLLABORATION</h3>
-      <p data-field="sec2_p1">This Agreement establishes the understanding between CloudSwyft Global Systems Inc. and [ORGANIZATION], represented by [REPRESENTATIVE], regarding their proposed [TYPE].</p>
-      <p data-field="sec2_p2">The partnership/collaboration shall focus on [FOCUS], with the Parties working together toward the objectives and expected outcomes mutually agreed upon under this Agreement.</p>
-      <p data-field="sec2_p3">The specific activities, responsibilities, resources, and other arrangements shall be determined based on the nature and scope of the partnership/collaboration.</p>
-    </section>
+            <section>
+                <h3 data-field="sec2_title">2. PURPOSE OF THE PARTNERSHIP / COLLABORATION</h3>
+                <p data-field="sec2_p1">This Agreement establishes the understanding between CloudSwyft Global Systems
+                    Inc. and [ORGANIZATION], represented by [REPRESENTATIVE], regarding their proposed [TYPE].</p>
+                <p data-field="sec2_p2">The partnership/collaboration shall focus on [FOCUS], with the Parties working
+                    together toward the objectives and expected outcomes mutually agreed upon under this Agreement.</p>
+                <p data-field="sec2_p3">The specific activities, responsibilities, resources, and other arrangements
+                    shall be determined based on the nature and scope of the partnership/collaboration.</p>
+            </section>
 
-    <section>
-      <h3 data-field="sec3_title">3. COLLABORATION DETAILS</h3>
-      <div class="section-hero" id="sectionHero">
-        <img id="section3Image" src="Virtual Lab.png" alt="Virtual Lab"
-          onerror="this.style.display='none'; this.parentElement.innerHTML='<p style=\'padding:24px;text-align:center;color:#0a2a4a;\'>☁ Collaboration illustration</p>';">
-      </div>
-      <p data-field="sec3_intro">The Client shall provide the following information regarding the proposed partnership or collaboration:</p>
-      <div class="form-grid">
-        <label>Proposed Start Date:<input type="date" id="startDate"></label>
-        <label>Expected End Date:<input type="date" id="endDate"></label>
-        <label class="full">Project / Initiative Name:<input type="text" id="projectName" placeholder="Enter project or initiative name"></label>
-        <label class="full">Description of the Collaboration:<textarea id="description" placeholder="Describe the proposed partnership, collaboration, or initiative"></textarea></label>
-        <label class="full">Expected Outcome / Objective:<textarea id="outcome" placeholder="Enter expected outcome or objective"></textarea></label>
-      </div>
-    </section>
+            <section>
+                <h3 data-field="sec3_title">3. COLLABORATION DETAILS</h3>
+                <div class="section-hero" id="sectionHero">
+                    <img id="section3Image" src="Virtual Lab.png" alt="Virtual Lab"
+                        onerror="this.style.display='none'; this.parentElement.innerHTML='<p style=\'padding:24px;text-align:center;color:#0a2a4a;\'>☁ Collaboration illustration</p>';">
+                </div>
+                <p data-field="sec3_intro">The Client shall provide the following information regarding the proposed
+                    partnership or collaboration:</p>
+                <div class="form-grid">
+                    <label>Proposed Start Date:<input type="date" id="startDate"></label>
+                    <label>Expected End Date:<input type="date" id="endDate"></label>
+                    <label class="full">Project / Initiative Name:<input type="text" id="projectName"
+                            placeholder="Enter project or initiative name"></label>
+                    <label class="full">Description of the Collaboration:<textarea id="description"
+                            placeholder="Describe the proposed partnership, collaboration, or initiative"></textarea></label>
+                    <label class="full">Expected Outcome / Objective:<textarea id="outcome"
+                            placeholder="Enter expected outcome or objective"></textarea></label>
+                </div>
+            </section>
 
-    <section>
-      <h3 data-field="sec4_title">4. RESPONSIBILITIES OF THE PARTIES</h3>
-      <p><strong data-field="sec4_partner_title">The Partner shall:</strong></p>
-      <ul id="sec4_partner_items"></ul>
-      <p><strong data-field="sec4_cloud_title">CloudSwyft shall:</strong></p>
-      <ul id="sec4_cloud_items"></ul>
-    </section>
+            <section>
+                <h3 data-field="sec4_title">4. RESPONSIBILITIES OF THE PARTIES</h3>
+                <p><strong data-field="sec4_partner_title">The Partner shall:</strong></p>
+                <ul id="sec4_partner_items"></ul>
+                <p><strong data-field="sec4_cloud_title">CloudSwyft shall:</strong></p>
+                <ul id="sec4_cloud_items"></ul>
+            </section>
 
-    <section>
-      <h3 data-field="sec5_title">5. CONFIDENTIALITY</h3>
-      <p data-field="sec5_p1">The Partner and CloudSwyft shall maintain the confidentiality of non-public information shared in connection with the partnership or collaboration.</p>
-      <p data-field="sec5_p2">Neither party shall disclose confidential information to unauthorized individuals or organizations unless otherwise agreed upon or required by applicable law.</p>
-    </section>
+            <section>
+                <h3 data-field="sec5_title">5. CONFIDENTIALITY</h3>
+                <p data-field="sec5_p1">The Partner and CloudSwyft shall maintain the confidentiality of non-public
+                    information shared in connection with the partnership or collaboration.</p>
+                <p data-field="sec5_p2">Neither party shall disclose confidential information to unauthorized
+                    individuals or organizations unless otherwise agreed upon or required by applicable law.</p>
+            </section>
 
-    <section>
-      <h3 data-field="sec6_title">6. CHANGES TO THE AGREEMENT</h3>
-      <p data-field="sec6_p1">The Partner and CloudSwyft shall agree in writing to any significant changes to the purpose, scope, responsibilities, or other terms of this Agreement.</p>
-      <p data-field="sec6_p2">Additional activities or initiatives may be included upon mutual agreement.</p>
-      <p data-field="sec6_p3">The Parties shall communicate with each other regarding any proposed changes to the partnership or collaboration.</p>
-      <p data-field="sec6_p4">Any changes to the purpose, scope, activities, responsibilities, timeline, or other significant terms of this Agreement shall be discussed and mutually agreed upon by the Parties.</p>
-      <p data-field="sec6_p5">The Partner shall not be required to undertake additional activities or responsibilities that were not included in the original agreement unless such changes have been mutually agreed upon.</p>
-      <p data-field="sec6_p6">Where necessary, the Parties shall document the agreed changes through a written amendment, updated agreement, or other form of documented approval.</p>
-      <p data-field="sec6_p7">Any approved changes shall form part of the Agreement and shall be followed by both Parties.</p>
-    </section>
+            <section>
+                <h3 data-field="sec6_title">6. CHANGES TO THE AGREEMENT</h3>
+                <p data-field="sec6_p1">The Partner and CloudSwyft shall agree in writing to any significant changes to
+                    the purpose, scope, responsibilities, or other terms of this Agreement.</p>
+                <p data-field="sec6_p2">Additional activities or initiatives may be included upon mutual agreement.</p>
+                <p data-field="sec6_p3">The Parties shall communicate with each other regarding any proposed changes to
+                    the partnership or collaboration.</p>
+                <p data-field="sec6_p4">Any changes to the purpose, scope, activities, responsibilities, timeline, or
+                    other significant terms of this Agreement shall be discussed and mutually agreed upon by the
+                    Parties.</p>
+                <p data-field="sec6_p5">The Partner shall not be required to undertake additional activities or
+                    responsibilities that were not included in the original agreement unless such changes have been
+                    mutually agreed upon.</p>
+                <p data-field="sec6_p6">Where necessary, the Parties shall document the agreed changes through a written
+                    amendment, updated agreement, or other form of documented approval.</p>
+                <p data-field="sec6_p7">Any approved changes shall form part of the Agreement and shall be followed by
+                    both Parties.</p>
+            </section>
 
-    <section>
-      <h3 data-field="sec7_title">7. DURATION AND TERMINATION</h3>
-      <p data-field="sec7_p1">This Agreement may be terminated before the expected end date by either Party upon written notice to the other Party.</p>
-      <p data-field="sec7_p2">Upon termination, the Parties shall communicate regarding any ongoing activities, responsibilities, or commitments that need to be completed or addressed.</p>
-      <p data-field="sec7_p3">Any provisions of this Agreement that are intended to remain in effect after termination, including confidentiality and intellectual property obligations, shall continue to apply.</p>
-    </section>
+            <section>
+                <h3 data-field="sec7_title">7. DURATION AND TERMINATION</h3>
+                <p data-field="sec7_p1">This Agreement may be terminated before the expected end date by either Party
+                    upon written notice to the other Party.</p>
+                <p data-field="sec7_p2">Upon termination, the Parties shall communicate regarding any ongoing
+                    activities, responsibilities, or commitments that need to be completed or addressed.</p>
+                <p data-field="sec7_p3">Any provisions of this Agreement that are intended to remain in effect after
+                    termination, including confidentiality and intellectual property obligations, shall continue to
+                    apply.</p>
+            </section>
 
-    <section>
-      <h3 data-field="sec8_title">8. CONFIRMATION AND AGREEMENT</h3>
-      <p data-field="sec8_p1">The Partner shall confirm that all information provided in this Agreement is accurate and complete.</p>
-      <p data-field="sec8_p2">By completing the required information and providing an electronic signature, the Partner acknowledges that the Partner has read, understood, and agreed to the terms and conditions of this Agreement.</p>
-      <p data-field="sec8_p3">The Partner further acknowledges that the proposed partnership, collaboration, project, or initiative has been discussed and mutually understood by both Parties. The Partner agrees to fulfill the responsibilities and commitments mutually agreed upon with CloudSwyft, and understands that any additional activities, commitments, or changes shall be subject to mutual agreement between the Parties.</p>
-      <p data-field="sec8_p4">By providing an electronic signature, the authorized representatives acknowledge their agreement to the terms stated in this Agreement.</p>
-    </section>
+            <section>
+                <h3 data-field="sec8_title">8. CONFIRMATION AND AGREEMENT</h3>
+                <p data-field="sec8_p1">The Partner shall confirm that all information provided in this Agreement is
+                    accurate and complete.</p>
+                <p data-field="sec8_p2">By completing the required information and providing an electronic signature,
+                    the Partner acknowledges that the Partner has read, understood, and agreed to the terms and
+                    conditions of this Agreement.</p>
+                <p data-field="sec8_p3">The Partner further acknowledges that the proposed partnership, collaboration,
+                    project, or initiative has been discussed and mutually understood by both Parties. The Partner
+                    agrees to fulfill the responsibilities and commitments mutually agreed upon with CloudSwyft, and
+                    understands that any additional activities, commitments, or changes shall be subject to mutual
+                    agreement between the Parties.</p>
+                <p data-field="sec8_p4">By providing an electronic signature, the authorized representatives acknowledge
+                    their agreement to the terms stated in this Agreement.</p>
+            </section>
 
-    <section>
-      <h3 data-field="sec9_title">9. USE AND REPRODUCTION OF CLOUDSWYFT MATERIALS</h3>
-      <p data-field="sec9_p1">The Client shall not reproduce, copy, modify, distribute, publish, or otherwise use the CloudSwyft name, logo, branding, documents, materials, or other proprietary content provided in connection with this Agreement without the prior written consent of CloudSwyft Global Systems Inc.</p>
-      <p data-field="sec9_p2">The CloudSwyft name, logo, and other materials included in this Agreement are provided solely for the purpose of reviewing and completing the proposed partnership or collaboration.</p>
-      <p data-field="sec9_p3">Any permitted use following the execution of this Agreement shall remain subject to the terms and conditions agreed upon by the Parties.</p>
-    </section>
+            <section>
+                <h3 data-field="sec9_title">9. USE AND REPRODUCTION OF CLOUDSWYFT MATERIALS</h3>
+                <p data-field="sec9_p1">The Client shall not reproduce, copy, modify, distribute, publish, or otherwise
+                    use the CloudSwyft name, logo, branding, documents, materials, or other proprietary content provided
+                    in connection with this Agreement without the prior written consent of CloudSwyft Global Systems
+                    Inc.</p>
+                <p data-field="sec9_p2">The CloudSwyft name, logo, and other materials included in this Agreement are
+                    provided solely for the purpose of reviewing and completing the proposed partnership or
+                    collaboration.</p>
+                <p data-field="sec9_p3">Any permitted use following the execution of this Agreement shall remain subject
+                    to the terms and conditions agreed upon by the Parties.</p>
+            </section>
 
-    <section class="signatures">
-      <div class="signature-card">
-        <h4 data-field="sig_client_title">CLIENT</h4>
-        <label>Authorized Representative:<input type="text" id="signatureClientName" placeholder="Enter full name"></label>
-        <label>Signature:</label>
-        <canvas id="clientSignature" class="signature-pad"></canvas>
-        <button type="button" class="clear-btn no-print" onclick="clearCanvas('clientSignature')">Clear</button>
-        <label>Date:<input type="date" id="signatureClientDate"></label>
-      </div>
-      <div class="signature-card">
-        <h4 data-field="sig_cloud_title">CLOUDSWYFT GLOBAL SYSTEMS INC.</h4>
-        <label>Authorized Representative:<input type="text" id="cloudswyftName" placeholder="Enter full name"></label>
-        <label>Signature:</label>
-        <canvas id="cloudswyftSignature" class="signature-pad"></canvas>
-        <button type="button" class="clear-btn no-print" onclick="clearCanvas('cloudswyftSignature')">Clear</button>
-        <label>Date:<input type="date" id="cloudswyftDate"></label>
-      </div>
-    </section>
+            <section class="signatures">
+                <div class="signature-card">
+                    <h4 data-field="sig_client_title">CLIENT</h4>
+                    <label>Authorized Representative:<input type="text" id="signatureClientName"
+                            placeholder="Enter full name"></label>
+                    <label>Signature:</label>
+                    <canvas id="clientSignature" class="signature-pad"></canvas>
+                    <button type="button" class="clear-btn no-print"
+                        onclick="clearCanvas('clientSignature')">Clear</button>
+                    <label>Date:<input type="date" id="signatureClientDate"></label>
+                </div>
+                <div class="signature-card">
+                    <h4 data-field="sig_cloud_title">CLOUDSWYFT GLOBAL SYSTEMS INC.</h4>
+                    <label>Authorized Representative:<input type="text" id="cloudswyftName"
+                            placeholder="Enter full name"></label>
+                    <label>Signature:</label>
+                    <canvas id="cloudswyftSignature" class="signature-pad"></canvas>
+                    <button type="button" class="clear-btn no-print"
+                        onclick="clearCanvas('cloudswyftSignature')">Clear</button>
+                    <label>Date:<input type="date" id="cloudswyftDate"></label>
+                </div>
+            </section>
 
-    <section>
-      <h3 data-field="completion_title">AGREEMENT COMPLETION</h3>
-      <p data-field="completion_text">Once the required information has been completed and the authorized representatives have provided their electronic signatures, the completed Agreement shall be retained by the Parties for reference.</p>
-    </section>
+            <section>
+                <h3 data-field="completion_title">AGREEMENT COMPLETION</h3>
+                <p data-field="completion_text">Once the required information has been completed and the authorized
+                    representatives have provided their electronic signatures, the completed Agreement shall be retained
+                    by the Parties for reference.</p>
+            </section>
 
-    <footer>
-      <p data-field="footer_text">Thank you for partnering with CloudSwyft.</p>
-    </footer>
+            <footer>
+                <p data-field="footer_text">Thank you for partnering with CloudSwyft.</p>
+            </footer>
 
-  </article>
+        </article>
 
-  <!-- ⭐ TOOLBAR — Nasa ILALIM na ng form ⭐ -->
-  <div class="toolbar no-print">
-    <button type="button" onclick="window.print()"><i class="fas fa-file-pdf"></i> Save as PDF</button>
-    <button type="button" onclick="window.print()"><i class="fas fa-print"></i> Print Contract</button>
-  </div>
+        <!-- ⭐ TOOLBAR — Nasa ILALIM na ng form ⭐ -->
+        <div class="toolbar no-print">
+            <button type="button" onclick="window.print()"><i class="fas fa-file-pdf"></i> Save as PDF</button>
+            <button type="button" onclick="window.print()"><i class="fas fa-print"></i> Print Contract</button>
+        </div>
 
-</div>
+    </div>
 
-<script>
-const DEFAULT_CONTENT = {
-  headerTitle:"Client Contract",
-  headerSubtitle:"Creating opportunities through technology, digital learning, and collaboration.",
-  sec1_title:"1. CLIENT INFORMATION",
-  sec1_intro:"The Client shall provide the following information:",
-  sec2_title:"2. PURPOSE OF THE PARTNERSHIP / COLLABORATION",
-  sec2_p1:"This Agreement establishes the understanding between CloudSwyft Global Systems Inc. and [ORGANIZATION], represented by [REPRESENTATIVE], regarding their proposed [TYPE].",
-  sec2_p2:"The partnership/collaboration shall focus on [FOCUS], with the Parties working together toward the objectives and expected outcomes mutually agreed upon under this Agreement.",
-  sec2_p3:"The specific activities, responsibilities, resources, and other arrangements shall be determined based on the nature and scope of the partnership/collaboration.",
-  sec3_title:"3. COLLABORATION DETAILS",
-  sec3_intro:"The Client shall provide the following information regarding the proposed partnership or collaboration:",
-  sec4_title:"4. RESPONSIBILITIES OF THE PARTIES",
-  sec4_partner_title:"The Partner shall:",
-  sec4_partner_items:[
-    "Provide accurate and complete information relevant to the partnership or collaboration.",
-    "Participate in the agreed activities and initiatives.",
-    "Provide the necessary information, materials, or resources that have been mutually agreed upon.",
-    "Communicate relevant updates, concerns, or changes to CloudSwyft.",
-    "Comply with the mutually agreed terms for the partnership or collaboration."
-  ],
-  sec4_cloud_title:"CloudSwyft shall:",
-  sec4_cloud_items:[
-    "Coordinate with the Partner regarding the agreed partnership or collaboration.",
-    "Participate in the mutually agreed activities and initiatives.",
-    "Provide relevant information and resources that have been agreed upon by both parties.",
-    "Communicate relevant updates and requirements to the Partner.",
-    "Work with the Partner toward the agreed objectives of the collaboration."
-  ],
-  sec5_title:"5. CONFIDENTIALITY",
-  sec5_p1:"The Partner and CloudSwyft shall maintain the confidentiality of non-public information shared in connection with the partnership or collaboration.",
-  sec5_p2:"Neither party shall disclose confidential information to unauthorized individuals or organizations unless otherwise agreed upon or required by applicable law.",
-  sec6_title:"6. CHANGES TO THE AGREEMENT",
-  sec6_p1:"The Partner and CloudSwyft shall agree in writing to any significant changes to the purpose, scope, responsibilities, or other terms of this Agreement.",
-  sec6_p2:"Additional activities or initiatives may be included upon mutual agreement.",
-  sec6_p3:"The Parties shall communicate with each other regarding any proposed changes to the partnership or collaboration.",
-  sec6_p4:"Any changes to the purpose, scope, activities, responsibilities, timeline, or other significant terms of this Agreement shall be discussed and mutually agreed upon by the Parties.",
-  sec6_p5:"The Partner shall not be required to undertake additional activities or responsibilities that were not included in the original agreement unless such changes have been mutually agreed upon.",
-  sec6_p6:"Where necessary, the Parties shall document the agreed changes through a written amendment, updated agreement, or other form of documented approval.",
-  sec6_p7:"Any approved changes shall form part of the Agreement and shall be followed by both Parties.",
-  sec7_title:"7. DURATION AND TERMINATION",
-  sec7_p1:"This Agreement may be terminated before the expected end date by either Party upon written notice to the other Party.",
-  sec7_p2:"Upon termination, the Parties shall communicate regarding any ongoing activities, responsibilities, or commitments that need to be completed or addressed.",
-  sec7_p3:"Any provisions of this Agreement that are intended to remain in effect after termination, including confidentiality and intellectual property obligations, shall continue to apply.",
-  sec8_title:"8. CONFIRMATION AND AGREEMENT",
-  sec8_p1:"The Partner shall confirm that all information provided in this Agreement is accurate and complete.",
-  sec8_p2:"By completing the required information and providing an electronic signature, the Partner acknowledges that the Partner has read, understood, and agreed to the terms and conditions of this Agreement.",
-  sec8_p3:"The Partner further acknowledges that the proposed partnership, collaboration, project, or initiative has been discussed and mutually understood by both Parties. The Partner agrees to fulfill the responsibilities and commitments mutually agreed upon with CloudSwyft, and understands that any additional activities, commitments, or changes shall be subject to mutual agreement between the Parties.",
-  sec8_p4:"By providing an electronic signature, the authorized representatives acknowledge their agreement to the terms stated in this Agreement.",
-  sec9_title:"9. USE AND REPRODUCTION OF CLOUDSWYFT MATERIALS",
-  sec9_p1:"The Client shall not reproduce, copy, modify, distribute, publish, or otherwise use the CloudSwyft name, logo, branding, documents, materials, or other proprietary content provided in connection with this Agreement without the prior written consent of CloudSwyft Global Systems Inc.",
-  sec9_p2:"The CloudSwyft name, logo, and other materials included in this Agreement are provided solely for the purpose of reviewing and completing the proposed partnership or collaboration.",
-  sec9_p3:"Any permitted use following the execution of this Agreement shall remain subject to the terms and conditions agreed upon by the Parties.",
-  sig_client_title:"CLIENT",
-  sig_cloud_title:"CLOUDSWYFT GLOBAL SYSTEMS INC.",
-  completion_title:"AGREEMENT COMPLETION",
-  completion_text:"Once the required information has been completed and the authorized representatives have provided their electronic signatures, the completed Agreement shall be retained by the Parties for reference.",
-  footer_text:"Thank you for partnering with CloudSwyft.",
-  section3Image: null,
-  section3ImageSettings: {
-    width: 600,
-    height: 0,
-    radius: 10,
-    fit: "cover",
-    align: "center",
-    margin: 4
-  }
-};
+    <script>
+        const DEFAULT_CONTENT = {
+            headerTitle: "Client Contract",
+            headerSubtitle: "Creating opportunities through technology, digital learning, and collaboration.",
+            sec1_title: "1. CLIENT INFORMATION",
+            sec1_intro: "The Client shall provide the following information:",
+            sec2_title: "2. PURPOSE OF THE PARTNERSHIP / COLLABORATION",
+            sec2_p1: "This Agreement establishes the understanding between CloudSwyft Global Systems Inc. and [ORGANIZATION], represented by [REPRESENTATIVE], regarding their proposed [TYPE].",
+            sec2_p2: "The partnership/collaboration shall focus on [FOCUS], with the Parties working together toward the objectives and expected outcomes mutually agreed upon under this Agreement.",
+            sec2_p3: "The specific activities, responsibilities, resources, and other arrangements shall be determined based on the nature and scope of the partnership/collaboration.",
+            sec3_title: "3. COLLABORATION DETAILS",
+            sec3_intro: "The Client shall provide the following information regarding the proposed partnership or collaboration:",
+            sec4_title: "4. RESPONSIBILITIES OF THE PARTIES",
+            sec4_partner_title: "The Partner shall:",
+            sec4_partner_items: [
+                "Provide accurate and complete information relevant to the partnership or collaboration.",
+                "Participate in the agreed activities and initiatives.",
+                "Provide the necessary information, materials, or resources that have been mutually agreed upon.",
+                "Communicate relevant updates, concerns, or changes to CloudSwyft.",
+                "Comply with the mutually agreed terms for the partnership or collaboration."
+            ],
+            sec4_cloud_title: "CloudSwyft shall:",
+            sec4_cloud_items: [
+                "Coordinate with the Partner regarding the agreed partnership or collaboration.",
+                "Participate in the mutually agreed activities and initiatives.",
+                "Provide relevant information and resources that have been agreed upon by both parties.",
+                "Communicate relevant updates and requirements to the Partner.",
+                "Work with the Partner toward the agreed objectives of the collaboration."
+            ],
+            sec5_title: "5. CONFIDENTIALITY",
+            sec5_p1: "The Partner and CloudSwyft shall maintain the confidentiality of non-public information shared in connection with the partnership or collaboration.",
+            sec5_p2: "Neither party shall disclose confidential information to unauthorized individuals or organizations unless otherwise agreed upon or required by applicable law.",
+            sec6_title: "6. CHANGES TO THE AGREEMENT",
+            sec6_p1: "The Partner and CloudSwyft shall agree in writing to any significant changes to the purpose, scope, responsibilities, or other terms of this Agreement.",
+            sec6_p2: "Additional activities or initiatives may be included upon mutual agreement.",
+            sec6_p3: "The Parties shall communicate with each other regarding any proposed changes to the partnership or collaboration.",
+            sec6_p4: "Any changes to the purpose, scope, activities, responsibilities, timeline, or other significant terms of this Agreement shall be discussed and mutually agreed upon by the Parties.",
+            sec6_p5: "The Partner shall not be required to undertake additional activities or responsibilities that were not included in the original agreement unless such changes have been mutually agreed upon.",
+            sec6_p6: "Where necessary, the Parties shall document the agreed changes through a written amendment, updated agreement, or other form of documented approval.",
+            sec6_p7: "Any approved changes shall form part of the Agreement and shall be followed by both Parties.",
+            sec7_title: "7. DURATION AND TERMINATION",
+            sec7_p1: "This Agreement may be terminated before the expected end date by either Party upon written notice to the other Party.",
+            sec7_p2: "Upon termination, the Parties shall communicate regarding any ongoing activities, responsibilities, or commitments that need to be completed or addressed.",
+            sec7_p3: "Any provisions of this Agreement that are intended to remain in effect after termination, including confidentiality and intellectual property obligations, shall continue to apply.",
+            sec8_title: "8. CONFIRMATION AND AGREEMENT",
+            sec8_p1: "The Partner shall confirm that all information provided in this Agreement is accurate and complete.",
+            sec8_p2: "By completing the required information and providing an electronic signature, the Partner acknowledges that the Partner has read, understood, and agreed to the terms and conditions of this Agreement.",
+            sec8_p3: "The Partner further acknowledges that the proposed partnership, collaboration, project, or initiative has been discussed and mutually understood by both Parties. The Partner agrees to fulfill the responsibilities and commitments mutually agreed upon with CloudSwyft, and understands that any additional activities, commitments, or changes shall be subject to mutual agreement between the Parties.",
+            sec8_p4: "By providing an electronic signature, the authorized representatives acknowledge their agreement to the terms stated in this Agreement.",
+            sec9_title: "9. USE AND REPRODUCTION OF CLOUDSWYFT MATERIALS",
+            sec9_p1: "The Client shall not reproduce, copy, modify, distribute, publish, or otherwise use the CloudSwyft name, logo, branding, documents, materials, or other proprietary content provided in connection with this Agreement without the prior written consent of CloudSwyft Global Systems Inc.",
+            sec9_p2: "The CloudSwyft name, logo, and other materials included in this Agreement are provided solely for the purpose of reviewing and completing the proposed partnership or collaboration.",
+            sec9_p3: "Any permitted use following the execution of this Agreement shall remain subject to the terms and conditions agreed upon by the Parties.",
+            sig_client_title: "CLIENT",
+            sig_cloud_title: "CLOUDSWYFT GLOBAL SYSTEMS INC.",
+            completion_title: "AGREEMENT COMPLETION",
+            completion_text: "Once the required information has been completed and the authorized representatives have provided their electronic signatures, the completed Agreement shall be retained by the Parties for reference.",
+            footer_text: "Thank you for partnering with CloudSwyft.",
+            section3Image: null,
+            /* ⭐ NEW BANNER-STYLE DEFAULTS ⭐ */
+            section3ImageSettings: {
+                width: 1000,
+                height: 250,
+                radius: 18,
+                fit: "cover",
+                align: "center",
+                margin: 4
+            }
+        };
 
-const STORAGE_KEY = "cloudswyft_contract_content";
-const JSON_FILE = "contract-content.json";
+        const STORAGE_KEY = "cloudswyft_contract_content";
+        const JSON_FILE = "contract-content.json";
 
-async function loadContent() {
-  try {
-    const response = await fetch(JSON_FILE + "?v=" + Date.now(), { cache: "no-cache" });
-    if (response.ok) {
-      const json = await response.json();
-      console.log("✅ Loaded content from contract-content.json");
-      return {
-        ...DEFAULT_CONTENT,
-        ...json,
-        section3ImageSettings: {
-          ...DEFAULT_CONTENT.section3ImageSettings,
-          ...(json.section3ImageSettings || {})
+        async function loadContent() {
+            try {
+                const response = await fetch(JSON_FILE + "?v=" + Date.now(), { cache: "no-cache" });
+                if (response.ok) {
+                    const json = await response.json();
+                    console.log("✅ Loaded content from contract-content.json");
+                    return {
+                        ...DEFAULT_CONTENT,
+                        ...json,
+                        section3ImageSettings: {
+                            ...DEFAULT_CONTENT.section3ImageSettings,
+                            ...(json.section3ImageSettings || {})
+                        }
+                    };
+                }
+            } catch (e) {
+                console.log("ℹ️ No contract-content.json found — using fallback");
+            }
+
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const json = JSON.parse(saved);
+                    console.log("✅ Loaded content from localStorage");
+                    return {
+                        ...DEFAULT_CONTENT,
+                        ...json,
+                        section3ImageSettings: {
+                            ...DEFAULT_CONTENT.section3ImageSettings,
+                            ...(json.section3ImageSettings || {})
+                        }
+                    };
+                }
+            } catch (e) {
+                console.warn("localStorage read error:", e);
+            }
+
+            console.log("ℹ️ Using default content");
+            return {
+                ...DEFAULT_CONTENT,
+                section3ImageSettings: { ...DEFAULT_CONTENT.section3ImageSettings }
+            };
         }
-      };
-    }
-  } catch(e) {
-    console.log("ℹ️ No contract-content.json found — using fallback");
-  }
 
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const json = JSON.parse(saved);
-      console.log("✅ Loaded content from localStorage");
-      return {
-        ...DEFAULT_CONTENT,
-        ...json,
-        section3ImageSettings: {
-          ...DEFAULT_CONTENT.section3ImageSettings,
-          ...(json.section3ImageSettings || {})
+        function applyContent(c) {
+            document.querySelectorAll("[data-field]").forEach(el => {
+                const key = el.dataset.field;
+                if (c[key] !== undefined && !Array.isArray(c[key])) {
+                    el.textContent = c[key];
+                }
+            });
+
+            const img = document.getElementById("section3Image");
+            const hero = document.getElementById("sectionHero");
+            if (img) {
+                const s = c.section3ImageSettings;
+                img.src = c.section3Image || "Virtual Lab.png";
+                img.style.display = "block";
+                img.style.maxWidth = s.width + "px";
+                img.style.width = "100%";
+                img.style.objectFit = s.fit;
+                img.style.borderRadius = s.radius + "px";
+                img.style.marginTop = s.margin + "px";
+                img.style.marginBottom = s.margin + "px";
+
+                if (s.height > 0) {
+                    img.style.height = s.height + "px";
+                    img.style.maxHeight = s.height + "px";
+                } else {
+                    img.style.height = "auto";
+                    img.style.maxHeight = "none";
+                }
+
+                if (s.align === "left") {
+                    img.style.marginLeft = "0";
+                    img.style.marginRight = "auto";
+                } else if (s.align === "right") {
+                    img.style.marginLeft = "auto";
+                    img.style.marginRight = "0";
+                } else {
+                    img.style.marginLeft = "auto";
+                    img.style.marginRight = "auto";
+                }
+
+                if (hero) hero.style.textAlign = s.align;
+            }
+
+            function renderList(id, items) {
+                const ul = document.getElementById(id);
+                if (!ul) return;
+                ul.innerHTML = "";
+                (items || []).forEach(item => {
+                    const li = document.createElement("li");
+                    li.textContent = item;
+                    ul.appendChild(li);
+                });
+            }
+            renderList("sec4_partner_items", c.sec4_partner_items);
+            renderList("sec4_cloud_items", c.sec4_cloud_items);
+
+            const p1 = document.querySelector('[data-field="sec2_p1"]');
+            if (p1) {
+                p1.innerHTML = c.sec2_p1
+                    .replace(/\[ORGANIZATION\]/g, '<span class="inline-fill" id="purposeOrganization" contenteditable="true" data-placeholder="Organization / Institution"></span>')
+                    .replace(/\[REPRESENTATIVE\]/g, '<span class="inline-fill" id="purposeRepresentative" contenteditable="true" data-placeholder="Authorized Representative"></span>')
+                    .replace(/\[TYPE\]/g, '<span class="inline-fill" id="proposedType" contenteditable="true" data-placeholder="partnership / collaboration"></span>');
+            }
+            const p2 = document.querySelector('[data-field="sec2_p2"]');
+            if (p2) {
+                p2.innerHTML = c.sec2_p2
+                    .replace(/\[FOCUS\]/g, '<span class="inline-fill" id="purposeFocus" contenteditable="true" data-placeholder="Enter focus of the partnership / collaboration"></span>');
+            }
+
+            document.querySelectorAll(".inline-fill").forEach(el => {
+                el.addEventListener("keydown", e => {
+                    if (e.key === "Enter") { e.preventDefault(); el.blur(); }
+                });
+                el.addEventListener("paste", e => {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData("text/plain");
+                    document.execCommand("insertText", false, text);
+                });
+            });
+
+            const orgInput = document.getElementById("organization");
+            const nameInput = document.getElementById("clientName");
+            const dateInput = document.getElementById("clientDate");
+            const sigName = document.getElementById("signatureClientName");
+            const sigDate = document.getElementById("signatureClientDate");
+
+            if (orgInput) orgInput.addEventListener("input", e => {
+                const el = document.getElementById("purposeOrganization");
+                if (el) el.textContent = e.target.value;
+            });
+            if (nameInput) nameInput.addEventListener("input", e => {
+                const el = document.getElementById("purposeRepresentative");
+                if (el) el.textContent = e.target.value;
+                if (sigName) sigName.value = e.target.value;
+            });
+            if (dateInput) dateInput.addEventListener("input", e => {
+                if (sigDate) sigDate.value = e.target.value;
+            });
         }
-      };
-    }
-  } catch(e) {
-    console.warn("localStorage read error:", e);
-  }
 
-  console.log("ℹ️ Using default content");
-  return {
-    ...DEFAULT_CONTENT,
-    section3ImageSettings: { ...DEFAULT_CONTENT.section3ImageSettings }
-  };
-}
+        function setupCanvas(id) {
+            const canvas = document.getElementById(id);
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            let drawing = false;
+            function resize() {
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                const rect = canvas.getBoundingClientRect();
+                const old = canvas.toDataURL();
+                canvas.width = rect.width * ratio;
+                canvas.height = rect.height * ratio;
+                ctx.scale(ratio, ratio);
+                ctx.lineWidth = 2.8;
+                ctx.lineCap = "round";
+                ctx.strokeStyle = "#0a2a4a";
+                if (old !== "data:,") {
+                    const img = new Image();
+                    img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+                    img.src = old;
+                }
+            }
+            resize();
+            window.addEventListener("resize", resize);
+            function pos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const point = e.touches ? e.touches[0] : e;
+                return { x: point.clientX - rect.left, y: point.clientY - rect.top };
+            }
+            function start(e) { e.preventDefault(); drawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+            function draw(e) { if (!drawing) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+            function stop() { drawing = false; }
+            canvas.addEventListener("mousedown", start);
+            canvas.addEventListener("mousemove", draw);
+            canvas.addEventListener("mouseup", stop);
+            canvas.addEventListener("mouseleave", stop);
+            canvas.addEventListener("touchstart", start, { passive: false });
+            canvas.addEventListener("touchmove", draw, { passive: false });
+            canvas.addEventListener("touchend", stop);
+        }
+        function clearCanvas(id) {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
 
-function applyContent(c) {
-  document.querySelectorAll("[data-field]").forEach(el => {
-    const key = el.dataset.field;
-    if (c[key] !== undefined && !Array.isArray(c[key])) {
-      el.textContent = c[key];
-    }
-  });
+        document.addEventListener("DOMContentLoaded", async () => {
+            const content = await loadContent();
+            applyContent(content);
+            setupCanvas("clientSignature");
+            setupCanvas("cloudswyftSignature");
+        });
 
-  const img = document.getElementById("section3Image");
-  const hero = document.getElementById("sectionHero");
-  if (img) {
-    const s = c.section3ImageSettings;
-    img.src = c.section3Image || "Virtual Lab.png";
-    img.style.display = "block";
-    img.style.maxWidth = s.width + "px";
-    img.style.width = "100%";
-    img.style.objectFit = s.fit;
-    img.style.borderRadius = s.radius + "px";
-    img.style.marginTop = s.margin + "px";
-    img.style.marginBottom = s.margin + "px";
-
-    if (s.height > 0) {
-      img.style.height = s.height + "px";
-      img.style.maxHeight = s.height + "px";
-    } else {
-      img.style.height = "auto";
-      img.style.maxHeight = "none";
-    }
-
-    if (s.align === "left") {
-      img.style.marginLeft = "0";
-      img.style.marginRight = "auto";
-    } else if (s.align === "right") {
-      img.style.marginLeft = "auto";
-      img.style.marginRight = "0";
-    } else {
-      img.style.marginLeft = "auto";
-      img.style.marginRight = "auto";
-    }
-
-    if (hero) hero.style.textAlign = s.align;
-  }
-
-  function renderList(id, items) {
-    const ul = document.getElementById(id);
-    if (!ul) return;
-    ul.innerHTML = "";
-    (items || []).forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      ul.appendChild(li);
-    });
-  }
-  renderList("sec4_partner_items", c.sec4_partner_items);
-  renderList("sec4_cloud_items", c.sec4_cloud_items);
-
-  const p1 = document.querySelector('[data-field="sec2_p1"]');
-  if (p1) {
-    p1.innerHTML = c.sec2_p1
-      .replace(/\[ORGANIZATION\]/g, '<span class="inline-fill" id="purposeOrganization" contenteditable="true" data-placeholder="Organization / Institution"></span>')
-      .replace(/\[REPRESENTATIVE\]/g, '<span class="inline-fill" id="purposeRepresentative" contenteditable="true" data-placeholder="Authorized Representative"></span>')
-      .replace(/\[TYPE\]/g, '<span class="inline-fill" id="proposedType" contenteditable="true" data-placeholder="partnership / collaboration"></span>');
-  }
-  const p2 = document.querySelector('[data-field="sec2_p2"]');
-  if (p2) {
-    p2.innerHTML = c.sec2_p2
-      .replace(/\[FOCUS\]/g, '<span class="inline-fill" id="purposeFocus" contenteditable="true" data-placeholder="Enter focus of the partnership / collaboration"></span>');
-  }
-
-  document.querySelectorAll(".inline-fill").forEach(el => {
-    el.addEventListener("keydown", e => {
-      if (e.key === "Enter") { e.preventDefault(); el.blur(); }
-    });
-    el.addEventListener("paste", e => {
-      e.preventDefault();
-      const text = (e.clipboardData || window.clipboardData).getData("text/plain");
-      document.execCommand("insertText", false, text);
-    });
-  });
-
-  const orgInput = document.getElementById("organization");
-  const nameInput = document.getElementById("clientName");
-  const dateInput = document.getElementById("clientDate");
-  const sigName = document.getElementById("signatureClientName");
-  const sigDate = document.getElementById("signatureClientDate");
-
-  if (orgInput) orgInput.addEventListener("input", e => {
-    const el = document.getElementById("purposeOrganization");
-    if (el) el.textContent = e.target.value;
-  });
-  if (nameInput) nameInput.addEventListener("input", e => {
-    const el = document.getElementById("purposeRepresentative");
-    if (el) el.textContent = e.target.value;
-    if (sigName) sigName.value = e.target.value;
-  });
-  if (dateInput) dateInput.addEventListener("input", e => {
-    if (sigDate) sigDate.value = e.target.value;
-  });
-}
-
-function setupCanvas(id) {
-  const canvas = document.getElementById(id);
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  let drawing = false;
-  function resize() {
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    const rect = canvas.getBoundingClientRect();
-    const old = canvas.toDataURL();
-    canvas.width = rect.width * ratio;
-    canvas.height = rect.height * ratio;
-    ctx.scale(ratio, ratio);
-    ctx.lineWidth = 2.8;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#0a2a4a";
-    if (old !== "data:,") {
-      const img = new Image();
-      img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
-      img.src = old;
-    }
-  }
-  resize();
-  window.addEventListener("resize", resize);
-  function pos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const point = e.touches ? e.touches[0] : e;
-    return { x: point.clientX - rect.left, y: point.clientY - rect.top };
-  }
-  function start(e) { e.preventDefault(); drawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
-  function draw(e) { if (!drawing) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
-  function stop() { drawing = false; }
-  canvas.addEventListener("mousedown", start);
-  canvas.addEventListener("mousemove", draw);
-  canvas.addEventListener("mouseup", stop);
-  canvas.addEventListener("mouseleave", stop);
-  canvas.addEventListener("touchstart", start, { passive: false });
-  canvas.addEventListener("touchmove", draw, { passive: false });
-  canvas.addEventListener("touchend", stop);
-}
-function clearCanvas(id) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const content = await loadContent();
-  applyContent(content);
-  setupCanvas("clientSignature");
-  setupCanvas("cloudswyftSignature");
-});
-
-window.addEventListener("storage", async e => {
-  if (e.key === STORAGE_KEY) {
-    const content = await loadContent();
-    applyContent(content);
-  }
-});
-</script>
+        window.addEventListener("storage", async e => {
+            if (e.key === STORAGE_KEY) {
+                const content = await loadContent();
+                applyContent(content);
+            }
+        });
+    </script>
 
 </body>
+
 </html>

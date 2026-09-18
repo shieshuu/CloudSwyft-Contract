@@ -720,31 +720,31 @@
             <button type="button" class="preset-btn" data-preset="small" onclick="applyPreset('small')">
               <i class="fas fa-compress"></i> Small (300px)
             </button>
-            <button type="button" class="preset-btn active" data-preset="medium" onclick="applyPreset('medium')">
+            <button type="button" class="preset-btn" data-preset="medium" onclick="applyPreset('medium')">
               <i class="fas fa-expand"></i> Medium (600px)
+            </button>
+            <button type="button" class="preset-btn active" data-preset="banner" onclick="applyPreset('banner')">
+              <i class="fas fa-image"></i> Banner (Full)
             </button>
             <button type="button" class="preset-btn" data-preset="large" onclick="applyPreset('large')">
               <i class="fas fa-expand-arrows-alt"></i> Large (900px)
-            </button>
-            <button type="button" class="preset-btn" data-preset="full" onclick="applyPreset('full')">
-              <i class="fas fa-arrows-alt-h"></i> Full Width
             </button>
           </div>
 
           <div class="control-row">
             <label>Max Width</label>
-            <input type="range" id="imgWidth" min="100" max="1000" step="10" value="600">
-            <span class="control-value" id="imgWidthVal">600px</span>
+            <input type="range" id="imgWidth" min="100" max="1000" step="10" value="1000">
+            <span class="control-value" id="imgWidthVal">1000px</span>
           </div>
           <div class="control-row">
             <label>Max Height</label>
-            <input type="range" id="imgHeight" min="0" max="600" step="10" value="0">
-            <span class="control-value" id="imgHeightVal">Auto</span>
+            <input type="range" id="imgHeight" min="0" max="600" step="10" value="250">
+            <span class="control-value" id="imgHeightVal">250px</span>
           </div>
           <div class="control-row">
             <label>Corner Radius</label>
-            <input type="range" id="imgRadius" min="0" max="40" step="1" value="10">
-            <span class="control-value" id="imgRadiusVal">10px</span>
+            <input type="range" id="imgRadius" min="0" max="40" step="1" value="18">
+            <span class="control-value" id="imgRadiusVal">18px</span>
           </div>
 
           <div class="select-row">
@@ -942,10 +942,11 @@
       completion_text: "Once the required information has been completed and the authorized representatives have provided their electronic signatures, the completed Agreement shall be retained by the Parties for reference.",
       footer_text: "Thank you for partnering with CloudSwyft.",
       section3Image: null,
+      /* ⭐ NEW BANNER-STYLE DEFAULTS ⭐ */
       section3ImageSettings: {
-        width: 600,
-        height: 0,
-        radius: 10,
+        width: 1000,
+        height: 250,
+        radius: 18,
         fit: "cover",
         align: "center",
         margin: 4
@@ -1038,11 +1039,13 @@
         btn.classList.toggle("active", btn.dataset.align === s.align);
       });
 
+      // Preset highlighting
       let activePreset = "";
       if (s.width <= 320) activePreset = "small";
-      else if (s.width <= 650) activePreset = "medium";
+      else if (s.width <= 650 && s.height === 0) activePreset = "medium";
+      else if (s.width >= 950 && s.height >= 200) activePreset = "banner";
       else if (s.width <= 950) activePreset = "large";
-      else activePreset = "full";
+      else activePreset = "banner";
       document.querySelectorAll(".preset-btn").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.preset === activePreset);
       });
@@ -1065,13 +1068,14 @@
 
     function applyPreset(preset) {
       const s = pendingSettings;
-      if (preset === "small") { s.width = 300; s.height = 0; s.fit = "cover"; }
-      if (preset === "medium") { s.width = 600; s.height = 0; s.fit = "cover"; }
-      if (preset === "large") { s.width = 900; s.height = 0; s.fit = "cover"; }
-      if (preset === "full") { s.width = 1000; s.height = 0; s.fit = "cover"; }
+      if (preset === "small") { s.width = 300; s.height = 0; s.radius = 10; s.fit = "cover"; }
+      if (preset === "medium") { s.width = 600; s.height = 0; s.radius = 12; s.fit = "cover"; }
+      if (preset === "large") { s.width = 900; s.height = 0; s.radius = 14; s.fit = "cover"; }
+      if (preset === "banner") { s.width = 1000; s.height = 250; s.radius = 18; s.fit = "cover"; }
 
       document.getElementById("imgWidth").value = s.width;
       document.getElementById("imgHeight").value = s.height;
+      document.getElementById("imgRadius").value = s.radius;
       document.getElementById("imgFit").value = s.fit;
       updatePreview();
       syncControlsFromSettings();
