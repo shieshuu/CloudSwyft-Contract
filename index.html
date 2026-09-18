@@ -29,7 +29,6 @@
             --cloud-shadow: rgba(0, 119, 190, .12);
         }
 
-        /* ⭐ WEBSITE BACKGROUND — stronger, more visible gradient ⭐ */
         body {
             background: linear-gradient(160deg,
                     #e3f2fd 0%,
@@ -45,6 +44,19 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        input,
+        textarea,
+        [contenteditable="true"] {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         .bg-deco {
@@ -84,6 +96,34 @@
             width: 340px;
         }
 
+        .watermark-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 50000;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .watermark-layer .watermark-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: rgba(180, 30, 30, 0.14);
+            white-space: nowrap;
+            line-height: 3.2;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            transform: rotate(-28deg) scale(1.6);
+            transform-origin: center;
+            width: 300%;
+            height: 300%;
+            text-align: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
         .contract-wrapper {
             max-width: 880px;
             margin: 0 auto;
@@ -91,9 +131,8 @@
             z-index: 1;
         }
 
-        /* ⭐ PAGE CONTAINER — clean white/glass look ⭐ */
         .page {
-            background: rgba(255, 255, 255, .92);
+            background: rgba(255, 255, 255, .96);
             backdrop-filter: blur(14px);
             border-radius: 32px;
             padding: 48px 56px;
@@ -306,6 +345,9 @@
             height: 100%;
             object-fit: cover;
             object-position: center;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            user-drag: none;
         }
 
         .form-grid {
@@ -486,6 +528,108 @@
             margin-top: 0;
         }
 
+        /* ⭐ SECURITY OVERLAY ⭐ */
+        .screenshot-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(10, 42, 74, .88);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .screenshot-overlay.active {
+            display: flex;
+        }
+
+        .screenshot-overlay .box {
+            background: linear-gradient(145deg, #ffffff, #eaf4ff);
+            color: #0a2a4a;
+            border-radius: 24px;
+            padding: 36px 40px;
+            max-width: 520px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, .35);
+            border: 3px solid #d9534f;
+            animation: popIn .1s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(.96);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .screenshot-overlay .box i.shield {
+            font-size: 3rem;
+            color: #d9534f;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .screenshot-overlay .box h2 {
+            font-size: 1.5rem;
+            margin-bottom: 14px;
+            color: #b02a26;
+            letter-spacing: .3px;
+        }
+
+        .screenshot-overlay .box p {
+            font-size: 13.5px;
+            color: #143450;
+            text-align: left;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .screenshot-overlay .box ul {
+            text-align: left;
+            margin: 8px 0 14px 22px;
+            padding-left: 4px;
+        }
+
+        .screenshot-overlay .box ul li {
+            font-size: 13px;
+            color: #143450;
+            margin-bottom: 5px;
+        }
+
+        .screenshot-overlay .box button {
+            border: 0;
+            border-radius: 40px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #0077be, #005a9c);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: .95rem;
+            transition: all .2s;
+            margin-top: 8px;
+            min-width: 220px;
+        }
+
+        .screenshot-overlay .box button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0088d0, #0068b0);
+            transform: translateY(-2px);
+        }
+
+        .screenshot-overlay .box button:disabled {
+            background: #9bb8d4;
+            cursor: not-allowed;
+            transform: none;
+            opacity: .75;
+        }
+
         @media (max-width:700px) {
             body {
                 padding: 12px 10px;
@@ -555,7 +699,9 @@
             .bg-deco,
             .no-print,
             .toolbar,
-            .clear-btn {
+            .clear-btn,
+            .screenshot-overlay,
+            .watermark-layer {
                 display: none !important;
             }
 
@@ -650,9 +796,27 @@
     <div class="bg-deco bg-3" aria-hidden="true"><img src="3.png" alt=""></div>
     <div class="bg-deco bg-4" aria-hidden="true"><img src="4.png" alt=""></div>
 
+    <div class="watermark-layer" id="watermarkLayer" aria-hidden="true">
+        <div class="watermark-text" id="watermarkText"></div>
+    </div>
+
+    <div class="screenshot-overlay" id="screenshotOverlay">
+        <div class="box">
+            <i class="fas fa-shield-halved shield"></i>
+            <h2>Security Alert</h2>
+            <p><strong>Unauthorized activity detected on this document.</strong></p>
+            <p>This contract is strictly confidential. The following actions are <strong>NOT allowed</strong>:</p>
+            <ul>
+                <li>Taking screenshots (PrintScreen, Ctrl+Shift+S, Cmd+Shift+3/4/5)</li>
+                <li>Switching tabs, windows, or applications</li>
+                <li>Copying or right-clicking page content</li>
+            </ul>
+            <button type="button" id="dismissBtn" disabled>I Understand (1s)</button>
+        </div>
+    </div>
+
     <div class="contract-wrapper">
 
-        <!-- ⭐ PAGE 1: HEADER + SECTIONS 1–3 ⭐ -->
         <article class="page">
             <header class="contract-header">
                 <div class="brand">
@@ -713,7 +877,6 @@
             </section>
         </article>
 
-        <!-- ⭐ PAGE 2: SECTIONS 4–8 ⭐ -->
         <article class="page">
             <section>
                 <h3 data-field="sec4_title">4. RESPONSIBILITIES OF THE PARTIES</h3>
@@ -778,7 +941,6 @@
             </section>
         </article>
 
-        <!-- ⭐ PAGE 3: SECTION 9 + SIGNATURES + COMPLETION + BIG SPACE + FOOTER AT BOTTOM ⭐ -->
         <article class="page page-3">
             <section>
                 <h3 data-field="sec9_title">9. USE AND REPRODUCTION OF CLOUDSWYFT MATERIALS</h3>
@@ -823,16 +985,13 @@
                     by the Parties for reference.</p>
             </section>
 
-            <!-- ⭐ BIG SPACE — pushes the footer to the very bottom ⭐ -->
             <div class="page-spacer"></div>
 
-            <!-- ⭐ FOOTER — at the very bottom of the page ⭐ -->
             <footer>
                 <p data-field="footer_text">Thank you for partnering with CloudSwyft.</p>
             </footer>
         </article>
 
-        <!-- TOOLBAR — nasa ILALIM -->
         <div class="toolbar no-print">
             <button type="button" onclick="window.print()"><i class="fas fa-file-pdf"></i> Save as PDF</button>
             <button type="button" onclick="window.print()"><i class="fas fa-print"></i> Print Contract</button>
@@ -960,11 +1119,13 @@
             if (orgInput) orgInput.addEventListener("input", e => {
                 const el = document.getElementById("purposeOrganization");
                 if (el) el.textContent = e.target.value;
+                updateWatermark();
             });
             if (nameInput) nameInput.addEventListener("input", e => {
                 const el = document.getElementById("purposeRepresentative");
                 if (el) el.textContent = e.target.value;
                 if (sigName) sigName.value = e.target.value;
+                updateWatermark();
             });
             if (dateInput) dateInput.addEventListener("input", e => {
                 if (sigDate) sigDate.value = e.target.value;
@@ -1020,7 +1181,193 @@
             applyContent(DEFAULT_CONTENT);
             setupCanvas("clientSignature");
             setupCanvas("cloudswyftSignature");
+            initWatermark();
         });
+
+        function buildWatermarkPattern() {
+            const name = (document.getElementById("clientName")?.value || "").trim();
+            const org = (document.getElementById("organization")?.value || "").trim();
+            const email = (document.getElementById("email")?.value || "").trim();
+
+            const parts = [];
+            if (name) parts.push(name);
+            if (org) parts.push(org);
+            if (email) parts.push(email);
+
+            const stamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
+
+            const id = parts.length > 0 ? parts.join(' · ') : 'CONFIDENTIAL — CloudSwyft';
+
+            const line = `${id} · ${stamp}`;
+            const singleLine = Array(6).fill(line).join('     •     ');
+            return Array(40).fill(singleLine).join('\n');
+        }
+
+        function updateWatermark() {
+            const el = document.getElementById('watermarkText');
+            if (el) {
+                el.textContent = buildWatermarkPattern();
+            }
+        }
+
+        function initWatermark() {
+            updateWatermark();
+            setInterval(updateWatermark, 30000);
+        }
+
+        /* ⭐ ZERO-LATENCY SECURITY DETERRENT ⭐ */
+        (function () {
+            const overlay = document.getElementById('screenshotOverlay');
+            const dismissBtn = document.getElementById('dismissBtn');
+
+            let dismissLocked = false;
+            let cooldownTimer = null;
+            let overlayVisible = false;
+
+            function fire(reason) {
+                if (overlayVisible) return;
+                overlayVisible = true;
+
+                overlay.classList.add('active');
+                console.warn('[CloudSwyft] Security alert:', reason, new Date().toISOString());
+                startDismissCooldown(1);
+            }
+
+            function startDismissCooldown(seconds) {
+                dismissLocked = true;
+                let remaining = seconds;
+                if (cooldownTimer) clearInterval(cooldownTimer);
+
+                dismissBtn.disabled = true;
+                dismissBtn.textContent = `I Understand (${remaining}s)`;
+
+                cooldownTimer = setInterval(() => {
+                    remaining -= 1;
+                    if (remaining <= 0) {
+                        clearInterval(cooldownTimer);
+                        cooldownTimer = null;
+                        dismissLocked = false;
+                        dismissBtn.disabled = false;
+                        dismissBtn.textContent = 'I Understand';
+                    } else {
+                        dismissBtn.textContent = `I Understand (${remaining}s)`;
+                    }
+                }, 1000);
+            }
+
+            dismissBtn.addEventListener('click', function () {
+                if (dismissLocked) return;
+                overlay.classList.remove('active');
+                overlayVisible = false;
+            });
+
+            document.addEventListener('keydown', function (e) {
+                const key = (e.key || '').toLowerCase();
+
+                if (key === 'alt' || e.keyCode === 18) {
+                    e.preventDefault();
+                    fire('Alt key pressed');
+                    return;
+                }
+
+                if (key === 'meta' || e.keyCode === 91 || e.keyCode === 92
+                    || e.keyCode === 93 || e.keyCode === 224) {
+                    e.preventDefault();
+                    fire('Windows/Cmd key pressed');
+                    return;
+                }
+
+                if (key === 'printscreen' || e.keyCode === 44) {
+                    e.preventDefault();
+                    fire('PrintScreen key');
+                    return;
+                }
+
+                if (e.keyCode >= 112 && e.keyCode <= 123) {
+                    e.preventDefault();
+                    fire('Function key F' + (e.keyCode - 111));
+                    return;
+                }
+
+                if (e.ctrlKey && e.shiftKey) {
+                    e.preventDefault();
+                    fire('Ctrl+Shift+' + key.toUpperCase());
+                    return;
+                }
+
+                if (e.metaKey && e.shiftKey) {
+                    e.preventDefault();
+                    fire('Cmd+Shift+' + key.toUpperCase());
+                    return;
+                }
+
+                if (e.ctrlKey && e.shiftKey && e.metaKey) {
+                    e.preventDefault();
+                    fire('Ctrl+Shift+Cmd+' + key.toUpperCase());
+                    return;
+                }
+
+                if ((e.ctrlKey || e.metaKey) && ['a', 'c', 'x'].includes(key)) {
+                    const t = e.target;
+                    const isField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+                    if (!isField) {
+                        e.preventDefault();
+                        fire('Blocked copy/select-all');
+                    }
+                }
+            }, true);
+
+            document.addEventListener('contextmenu', function (e) {
+                const t = e.target;
+                const isField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+                if (!isField) {
+                    e.preventDefault();
+                    fire('Right-click');
+                }
+            });
+
+            document.addEventListener('copy', function (e) {
+                e.preventDefault();
+                fire('Copy blocked');
+            }, true);
+
+            document.addEventListener('cut', function (e) {
+                e.preventDefault();
+                fire('Cut blocked');
+            }, true);
+
+            document.addEventListener('selectstart', function (e) {
+                const t = e.target;
+                const isField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+                if (!isField) e.preventDefault();
+            });
+
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) {
+                    fire('Tab switch / minimized');
+                }
+            });
+
+            window.addEventListener('blur', function () {
+                if (document.hidden || !document.hasFocus()) {
+                    fire('App switch / window blur');
+                }
+            });
+
+            let devtoolsFlagged = false;
+            setInterval(function () {
+                const wDiff = window.outerWidth - window.innerWidth;
+                const hDiff = window.outerHeight - window.innerHeight;
+                const likelyOpen = wDiff > 180 || hDiff > 180;
+                if (likelyOpen && !devtoolsFlagged) {
+                    devtoolsFlagged = true;
+                    fire('Possible DevTools open');
+                } else if (!likelyOpen) {
+                    devtoolsFlagged = false;
+                }
+            }, 200);
+
+        })();
     </script>
 
 </body>
