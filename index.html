@@ -29,8 +29,15 @@
             --cloud-shadow: rgba(0, 119, 190, .12);
         }
 
+        /* ⭐ WEBSITE BACKGROUND — stronger, more visible gradient ⭐ */
         body {
-            background: linear-gradient(145deg, #f0f7fe 0%, #dae9f7 100%);
+            background: linear-gradient(160deg,
+                    #e3f2fd 0%,
+                    #c7e4fb 25%,
+                    #a8d4f5 50%,
+                    #c7e4fb 75%,
+                    #e3f2fd 100%);
+            background-attachment: fixed;
             color: #0a2a4a;
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.55;
@@ -84,7 +91,53 @@
             z-index: 1;
         }
 
-        /* TOOLBAR — nasa ILALIM */
+        /* ⭐ PAGE CONTAINER — clean white/glass look ⭐ */
+        .page {
+            background: rgba(255, 255, 255, .92);
+            backdrop-filter: blur(14px);
+            border-radius: 32px;
+            padding: 48px 56px;
+            box-shadow: 0 30px 50px rgba(0, 55, 100, .15), 0 12px 25px rgba(0, 0, 0, .05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, .9);
+            margin-bottom: 40px;
+        }
+
+        .page::before {
+            content: "☁";
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-size: 220px;
+            color: rgba(0, 119, 190, .04);
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 0;
+            transform: rotate(6deg);
+            font-weight: 300;
+        }
+
+        .page::after {
+            content: "☁";
+            position: absolute;
+            bottom: -40px;
+            left: -20px;
+            font-size: 260px;
+            color: rgba(0, 119, 190, .025);
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 0;
+            transform: rotate(-8deg);
+        }
+
+        .page>* {
+            position: relative;
+            z-index: 1;
+        }
+
         .toolbar {
             display: flex;
             gap: 12px;
@@ -137,51 +190,6 @@
             background: #c2dcf5;
         }
 
-        .contract {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(14px);
-            border-radius: 32px;
-            padding: 48px 56px;
-            box-shadow: 0 30px 50px rgba(0, 55, 100, .15), 0 12px 25px rgba(0, 0, 0, .05);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, .8);
-        }
-
-        .contract::before {
-            content: "☁";
-            position: absolute;
-            top: -20px;
-            right: 20px;
-            font-size: 220px;
-            color: rgba(0, 119, 190, .04);
-            font-family: 'Segoe UI', sans-serif;
-            line-height: 1;
-            pointer-events: none;
-            z-index: 0;
-            transform: rotate(6deg);
-            font-weight: 300;
-        }
-
-        .contract::after {
-            content: "☁";
-            position: absolute;
-            bottom: -40px;
-            left: -20px;
-            font-size: 260px;
-            color: rgba(0, 119, 190, .025);
-            font-family: 'Segoe UI', sans-serif;
-            line-height: 1;
-            pointer-events: none;
-            z-index: 0;
-            transform: rotate(-8deg);
-        }
-
-        .contract>* {
-            position: relative;
-            z-index: 1;
-        }
-
         .contract-header {
             display: flex;
             align-items: center;
@@ -232,6 +240,10 @@
             page-break-inside: avoid;
         }
 
+        section:last-child {
+            margin-bottom: 0;
+        }
+
         h3 {
             color: var(--cloud-deep);
             font-size: 15px;
@@ -277,7 +289,6 @@
             color: #143450;
         }
 
-        /* ⭐ FIXED BANNER IMAGE ⭐ */
         .section-hero {
             width: 100%;
             height: 250px;
@@ -460,14 +471,38 @@
             font-size: 16px;
         }
 
+        .page-3 {
+            display: flex;
+            flex-direction: column;
+            min-height: 900px;
+        }
+
+        .page-3 .page-spacer {
+            flex: 1;
+            min-height: 220px;
+        }
+
+        .page-3 footer {
+            margin-top: 0;
+        }
+
         @media (max-width:700px) {
             body {
                 padding: 12px 10px;
             }
 
-            .contract {
+            .page {
                 padding: 28px 20px;
                 border-radius: 26px;
+                margin-bottom: 28px;
+            }
+
+            .page-3 {
+                min-height: auto;
+            }
+
+            .page-3 .page-spacer {
+                min-height: 120px;
             }
 
             .contract-header {
@@ -529,18 +564,35 @@
                 max-width: 100% !important;
             }
 
-            .contract {
+            .page {
                 box-shadow: none !important;
                 border-radius: 0 !important;
                 padding: 0 !important;
                 border: none !important;
                 background: transparent !important;
                 backdrop-filter: none !important;
+                margin-bottom: 0 !important;
+                page-break-after: always;
             }
 
-            .contract::before,
-            .contract::after {
+            .page:last-child {
+                page-break-after: auto;
+            }
+
+            .page::before,
+            .page::after {
                 display: none !important;
+            }
+
+            .page-3 {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .page-3 .page-spacer {
+                flex: 1;
+                min-height: 100px;
             }
 
             input,
@@ -600,8 +652,8 @@
 
     <div class="contract-wrapper">
 
-        <article class="contract">
-
+        <!-- ⭐ PAGE 1: HEADER + SECTIONS 1–3 ⭐ -->
+        <article class="page">
             <header class="contract-header">
                 <div class="brand">
                     <img src="logo.png" alt="CloudSwyft" class="brand-logo"
@@ -642,7 +694,6 @@
 
             <section>
                 <h3 data-field="sec3_title">3. COLLABORATION DETAILS</h3>
-                <!-- ⭐ FIXED BANNER IMAGE ⭐ -->
                 <div class="section-hero">
                     <img id="section3Image" src="Virtual Lab.png" alt="Virtual Lab"
                         onerror="this.style.display='none'; this.parentElement.innerHTML='<p style=\'padding:24px;text-align:center;color:#0a2a4a;\'>☁ Collaboration illustration</p>';">
@@ -660,7 +711,10 @@
                             placeholder="Enter expected outcome or objective"></textarea></label>
                 </div>
             </section>
+        </article>
 
+        <!-- ⭐ PAGE 2: SECTIONS 4–8 ⭐ -->
+        <article class="page">
             <section>
                 <h3 data-field="sec4_title">4. RESPONSIBILITIES OF THE PARTIES</h3>
                 <p><strong data-field="sec4_partner_title">The Partner shall:</strong></p>
@@ -722,7 +776,10 @@
                 <p data-field="sec8_p4">By providing an electronic signature, the authorized representatives acknowledge
                     their agreement to the terms stated in this Agreement.</p>
             </section>
+        </article>
 
+        <!-- ⭐ PAGE 3: SECTION 9 + SIGNATURES + COMPLETION + BIG SPACE + FOOTER AT BOTTOM ⭐ -->
+        <article class="page page-3">
             <section>
                 <h3 data-field="sec9_title">9. USE AND REPRODUCTION OF CLOUDSWYFT MATERIALS</h3>
                 <p data-field="sec9_p1">The Client shall not reproduce, copy, modify, distribute, publish, or otherwise
@@ -766,10 +823,13 @@
                     by the Parties for reference.</p>
             </section>
 
+            <!-- ⭐ BIG SPACE — pushes the footer to the very bottom ⭐ -->
+            <div class="page-spacer"></div>
+
+            <!-- ⭐ FOOTER — at the very bottom of the page ⭐ -->
             <footer>
                 <p data-field="footer_text">Thank you for partnering with CloudSwyft.</p>
             </footer>
-
         </article>
 
         <!-- TOOLBAR — nasa ILALIM -->
@@ -841,39 +901,6 @@
             section3Image: null
         };
 
-        const STORAGE_KEY = "cloudswyft_contract_content";
-        const JSON_FILE = "contract-content.json";
-
-        async function loadContent() {
-            // Priority 1: JSON file (GitHub deployment)
-            try {
-                const response = await fetch(JSON_FILE + "?v=" + Date.now(), { cache: "no-cache" });
-                if (response.ok) {
-                    const json = await response.json();
-                    console.log("✅ Loaded content from contract-content.json");
-                    return { ...DEFAULT_CONTENT, ...json };
-                }
-            } catch (e) {
-                console.log("ℹ️ No contract-content.json found — using fallback");
-            }
-
-            // Priority 2: localStorage (local preview)
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    const json = JSON.parse(saved);
-                    console.log("✅ Loaded content from localStorage");
-                    return { ...DEFAULT_CONTENT, ...json };
-                }
-            } catch (e) {
-                console.warn("localStorage read error:", e);
-            }
-
-            // Priority 3: Default
-            console.log("ℹ️ Using default content");
-            return { ...DEFAULT_CONTENT };
-        }
-
         function applyContent(c) {
             document.querySelectorAll("[data-field]").forEach(el => {
                 const key = el.dataset.field;
@@ -882,7 +909,6 @@
                 }
             });
 
-            // ⭐ Section 3 image — simple lang, no size manipulation ⭐
             const img = document.getElementById("section3Image");
             if (img) {
                 img.src = c.section3Image || "Virtual Lab.png";
@@ -990,18 +1016,10 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        document.addEventListener("DOMContentLoaded", async () => {
-            const content = await loadContent();
-            applyContent(content);
+        document.addEventListener("DOMContentLoaded", () => {
+            applyContent(DEFAULT_CONTENT);
             setupCanvas("clientSignature");
             setupCanvas("cloudswyftSignature");
-        });
-
-        window.addEventListener("storage", async e => {
-            if (e.key === STORAGE_KEY) {
-                const content = await loadContent();
-                applyContent(content);
-            }
         });
     </script>
 
